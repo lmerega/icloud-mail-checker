@@ -19,7 +19,7 @@ async function setBadge(unread, signedIn) {
   const s = await getSettings();
   const text = !signedIn ? '!' : s.badge && unread > 0 ? (unread > 99 ? '99+' : String(unread)) : '';
   await chrome.action.setBadgeText({ text });
-  await chrome.action.setBadgeBackgroundColor({ color: signedIn ? '#7c3aed' : '#8a8a8a' });
+  await chrome.action.setBadgeBackgroundColor({ color: signedIn ? '#17a99b' : '#8a8a8a' });
 }
 
 /**

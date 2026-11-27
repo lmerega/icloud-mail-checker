@@ -58,7 +58,7 @@ async function home() {
   $('account').hidden = !signedIn;
   if (!signedIn) return;
   avatar(state.email, $('acc-avatar'));
-  $('acc-email').textContent = state.email;
+  $('acc-email').textContent = (state.unread || 0) > 0 ? `${state.email} (${state.unread})` : state.email;
   const n = state.unread || 0;
   $('acc-sub').textContent = `${n} ${t('unreadLabel')}`;
   $('hero-title').textContent = n > 0 ? `${n} ${t('unreadLabel')}` : t('heroZero');
@@ -100,7 +100,19 @@ function row(m) {
     actionBtn('archive', t('archive'), async () => { if ((await rowCall(m, 'archive')).ok) load(); }),
     actionBtn('trash', t('trash'), async () => { if ((await rowCall(m, 'trash')).ok) load(); })
   );
-  d.append(avatar(m.from), content, acts);
+  const star = document.createElement('button');
+  star.className = 'mail-star' + (m.starred ? ' on' : '');
+  star.title = t('star');
+  star.append(icon(m.starred ? 'star' : 'starBorder', 22));
+  star.onclick = async (e) => {
+    e.stopPropagation();
+    const r = await rowCall(m, 'star', { on: !m.starred });
+    if (!r.ok) return;
+    m.starred = !m.starred;
+    star.classList.toggle('on', m.starred);
+    star.replaceChildren(icon(m.starred ? 'star' : 'starBorder', 22));
+  };
+  d.append(avatar(m.from), content, acts, star);
   d.onclick = () => open(m);
   return d;
 }
