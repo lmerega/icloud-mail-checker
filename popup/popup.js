@@ -118,7 +118,7 @@ const CSP = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 
 // The reading pane is always light: emails that ship dark-mode rules (white text) would
 // otherwise turn invisible on the white pane, so those rules are disabled.
 const BASE = '<meta name="color-scheme" content="light"><base target="_blank"><style>html{color-scheme:light;background:#fff;color:#202124}body{font:14px Roboto,Arial,sans-serif;margin:12px;word-wrap:break-word}</style>';
-const lightOnly = (html) => html.replace(/prefers-color-schemes*:s*dark/gi, 'prefers-color-scheme: x-disabled');
+const lightOnly = (html) => html.replace(/prefers-color-scheme\s*:\s*dark/gi, 'prefers-color-scheme: x-disabled');
 
 function paintFlags() {
   $('act-read').replaceChildren(icon(current.unread ? 'read' : 'mail', 22));
