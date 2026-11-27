@@ -9,14 +9,13 @@ manage iCloud Mail from the toolbar. Sister project of
 
 ## Features
 
-- Unread badge and desktop notifications.
-- Material-style popup (light/dark): account row with unread count, mailbox with folder chips, search, open in a tab.
-- Search (any field) and folder views (inbox, archive, sent, trash).
-- Compose and reply (send payload taken from the web app, not yet exercised on a real mailbox).
+- Unread badge, desktop notifications and a "new mail" sound (six to choose from).
+- Material-style popup (light, dark or automatic): account row with unread count, folders, search, open in a tab.
+- Read whole conversations (remote images and trackers blocked), previous/next message navigation.
+- Mark read/unread, star, archive, delete and empty the trash.
+- Reply in HTML to HTML mail with an inline editor, or write a new message.
 - Verification-code detection with one-click copy.
-- Read messages in the popup (remote content blocked), see attachment names.
-- Mark read/unread, star, archive and delete (payloads from the web app; archive/delete/flag not yet exercised on a real mailbox).
-- Open any message in iCloud Mail with one click.
+- Open iCloud Mail from the toolbar, a shortcut (Alt+Shift+M) or a notification.
 - Settings export/import (preferences only). English and Italian.
 
 ## How it works
@@ -28,12 +27,12 @@ asked for or stored, and no data passes through a server of this project.
 
 **Limits**
 
-- Those endpoints are private and unverified: method names and payloads live
-  in `background/constants.js` and `background/icloud-api.js` and may need
-  adjusting against a real session.
+- The endpoints are private and undocumented: Apple can change them without notice. Everything
+  is isolated in `background/icloud-api.js` and `background/constants.js`.
 - One iCloud session per Chrome profile (cookies), so one account at a time.
-- Attachment download is not available yet.
-- Only the latest message of a conversation is shown.
+- iCloud does not push mail to extensions (and extensions cannot use IMAP), so the extension
+  checks at an interval you choose (30 seconds to 30 minutes) with a very light request.
+- Attachment download and sending attachments are not available yet.
 
 ## Install from source
 

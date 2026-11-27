@@ -1,12 +1,13 @@
 iCloud Mail Checker puts your iCloud Mail in the Chrome toolbar.
 
-• Unread badge and optional desktop notifications
-• Inbox, Archive, Sent and Trash with search
+• Unread badge, desktop notifications and an optional sound when new mail arrives
+• Inbox, Archive, Sent and Trash with search; empty the trash in one click
 • Read whole conversations, with remote images and trackers blocked
 • Mark read/unread, star, archive and delete from the popup or with hover buttons
-• Reply in HTML to HTML mail, or write a new message
+• Go to the previous or next message without going back to the list
+• Reply in HTML to HTML mail with an inline editor, or write a new message
 • Verification codes detected and copied in one click
-• Light and dark theme, English and Italian, settings export/import
+• Light, dark or automatic theme; English and Italian; settings export/import
 
 No password is requested or stored: sign in once at icloud.com and the extension uses that session. Mail goes only between your browser and Apple; the developer receives nothing.
 

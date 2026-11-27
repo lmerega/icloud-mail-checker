@@ -1,12 +1,13 @@
 iCloud Mail Checker porta iCloud Mail nella barra di Chrome.
 
-• Badge dei non letti e notifiche desktop facoltative
-• Posta, Archivio, Inviata e Cestino con ricerca
+• Badge dei non letti, notifiche desktop e suono facoltativo quando arriva una mail
+• Posta, Archivio, Inviata e Cestino con ricerca; svuota il cestino con un clic
 • Conversazioni complete, con immagini remote e tracker bloccati
 • Segna letto/non letto, preferiti, archivia ed elimina dal popup o con i pulsanti al passaggio del mouse
-• Risposte in HTML alle mail HTML, o nuovo messaggio
+• Passa alla mail precedente o successiva senza tornare all'elenco
+• Risposte in HTML alle mail HTML con editor integrato, o nuovo messaggio
 • Codici di verifica riconosciuti e copiati con un clic
-• Tema chiaro e scuro, italiano e inglese, esporta/importa impostazioni
+• Tema chiaro, scuro o automatico; italiano e inglese; esporta/importa impostazioni
 
 Nessuna password richiesta o salvata: accedi una volta a icloud.com e l'estensione usa quella sessione. La posta passa solo tra il tuo browser e Apple; lo sviluppatore non riceve nulla.
 
