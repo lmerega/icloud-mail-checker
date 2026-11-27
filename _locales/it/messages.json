@@ -253,5 +253,14 @@
   },
   "soundLabel": {
     "message": "Suono quando arriva una mail"
+  },
+  "testSound": {
+    "message": "Prova il suono"
+  },
+  "soundPlayed": {
+    "message": "Suono inviato. Se non senti nulla, controlla il volume del sistema."
+  },
+  "soundFailed": {
+    "message": "Impossibile riprodurre il suono"
   }
 }

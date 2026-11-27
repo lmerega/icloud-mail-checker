@@ -39,6 +39,12 @@ async function save() {
 for (const id of ['poll', 'notif', 'badge', 'sound', 'theme']) $(id).addEventListener('change', save);
 $('theme').addEventListener('change', () => applyTheme($('theme').value));
 
+$('testSound').onclick = async () => {
+  $('soundMsg').textContent = '…';
+  const r = await chrome.runtime.sendMessage({ action: 'testSound' });
+  $('soundMsg').textContent = r.ok ? t('soundPlayed') : `${t('soundFailed')}: ${r.error}`;
+};
+
 // Export/import: preferences only, never cookies or message data.
 $('export').onclick = async () => {
   const { settings } = await chrome.storage.sync.get('settings');

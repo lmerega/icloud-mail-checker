@@ -15,16 +15,19 @@ export async function scheduleAlarm() {
   await chrome.alarms.create(ALARM, { periodInMinutes: Math.max(0.5, Number(s.pollMinutes) || DEFAULTS.pollMinutes) });
 }
 
+export async function playDing() {
+  const ctxs = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
+  if (!ctxs.length) {
+    await chrome.offscreen.createDocument({
+      url: 'offscreen/offscreen.html', reasons: ['AUDIO_PLAYBACK'], justification: 'Play a sound when new mail arrives'
+    });
+  }
+  await chrome.runtime.sendMessage({ target: 'offscreen', type: 'ding' });
+}
+
 async function ding() {
-  try {
-    const ctxs = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
-    if (!ctxs.length) {
-      await chrome.offscreen.createDocument({
-        url: 'offscreen/offscreen.html', reasons: ['AUDIO_PLAYBACK'], justification: 'Play a sound when new mail arrives'
-      });
-    }
-    await chrome.runtime.sendMessage({ target: 'offscreen', type: 'ding' });
-  } catch { /* sound is a nicety: never break the check */ }
+  try { await playDing(); await chrome.storage.local.remove('soundError'); }
+  catch (e) { await chrome.storage.local.set({ soundError: String(e.message || e) }); }
 }
 
 async function setBadge(unread, signedIn) {
@@ -52,11 +55,11 @@ export async function poll(force = false) {
     }
     const msgs = await listMessages(FOLDERS.inbox, 30);
     const unread = msgs.filter((m) => m.unread);
-    const { seen = [] } = await chrome.storage.local.get('seen');
+    const { seen = [], primed = false } = await chrome.storage.local.get(['seen', 'primed']);
     const fresh = unread.filter((m) => !seen.includes(m.uid));
     const settings = await getSettings();
-    if (seen.length && fresh.length && settings.sound) await ding();
-    if (settings.notifications && seen.length) {
+    if (primed && fresh.length && settings.sound) await ding();
+    if (settings.notifications && primed && fresh.length) {
       for (const m of fresh.slice(0, 5)) {
         const code = findVerificationCode(`${m.subject} ${m.preview}`);
         await chrome.notifications.create(`m-${m.uid}`, {
@@ -70,6 +73,7 @@ export async function poll(force = false) {
     }
     await chrome.storage.local.set({
       sig,
+      primed: true,
       seen: unread.map((m) => m.uid).slice(0, 200),
       state: { signedIn: true, email: sess.email, unread: q.unseen, checkedAt: Date.now() }
     });

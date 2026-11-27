@@ -1,5 +1,5 @@
 import * as api from './background/icloud-api.js';
-import { ALARM, poll, scheduleAlarm } from './background/poller.js';
+import { ALARM, poll, scheduleAlarm, playDing } from './background/poller.js';
 import { findVerificationCode } from './lib/codes.js';
 
 const MAIL_URL = 'https://www.icloud.com/mail/';
@@ -39,6 +39,7 @@ const actions = {
     } catch (e) { out.folders = { ok: false, detail: String(e.message || e) }; }
     return out;
   },
+  testSound: () => playDing().then(() => ({ played: true })),
   emptyTrash: () => api.emptyFolder('Deleted Messages'),
   poll: () => poll(true),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),

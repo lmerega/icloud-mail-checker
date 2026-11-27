@@ -253,5 +253,14 @@
   },
   "soundLabel": {
     "message": "Sound when new mail arrives"
+  },
+  "testSound": {
+    "message": "Test sound"
+  },
+  "soundPlayed": {
+    "message": "Sound sent. If you hear nothing, check the system volume."
+  },
+  "soundFailed": {
+    "message": "Could not play the sound"
   }
 }
