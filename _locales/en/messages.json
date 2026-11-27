@@ -181,5 +181,38 @@
   },
   "heroZeroSub": {
     "message": "No new messages"
+  },
+  "sectionCheck": {
+    "message": "Mail checking"
+  },
+  "secs30": {
+    "message": "30 seconds"
+  },
+  "pollNote": {
+    "message": "iCloud cannot push mail to extensions, so the extension checks at this interval with a very light request. Shorter means new mail shows up sooner."
+  },
+  "sectionBackup": {
+    "message": "Backup"
+  },
+  "backupNote": {
+    "message": "Saves only your preferences, never mail or passwords."
+  },
+  "sectionConn": {
+    "message": "Connection check"
+  },
+  "connHint": {
+    "message": "If something does not work, open icloud.com in this browser, sign in, and check again."
+  },
+  "runCheck": {
+    "message": "Check now"
+  },
+  "connSession": {
+    "message": "Signed in to iCloud"
+  },
+  "connInbox": {
+    "message": "Inbox can be read"
+  },
+  "connFolders": {
+    "message": "Archive, Sent and Trash can be read"
   }
 }

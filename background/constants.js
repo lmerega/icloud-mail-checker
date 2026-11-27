@@ -17,7 +17,7 @@ export const FOLDERS = {
   sent: 'Sent Messages'
 };
 export const DEFAULTS = {
-  pollMinutes: 2,
+  pollMinutes: 1,
   notifications: true,
   badge: true
 };

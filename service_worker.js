@@ -18,21 +18,28 @@ chrome.storage.onChanged.addListener((c, area) => {
   if (area === 'sync' && c.settings) scheduleAlarm();
 });
 
-const shape = (x, d = 0) => x === null ? 'null' : Array.isArray(x) ? ['arr' + x.length, x.length && d < 3 ? shape(x[0], d + 1) : 0] : typeof x === 'object' ? Object.fromEntries(Object.entries(x).slice(0, 30).map(([k, y]) => [k, d < 3 ? shape(y, d + 1) : typeof y])) : typeof x;
-
 const actions = {
-  // Diagnostics: reports only the SHAPE of responses (keys/types), never mail content.
+  // Connection check for the options page: plain pass/fail per step, never mail content.
   async diag() {
     const out = {};
-    try { const s = await api.getSession(true); out.session = { mail: s.mailUrl.replace(/p\d+/, 'pNN'), hasDsid: !!s.dsid }; }
-    catch (e) { return { session: 'FAIL ' + e.message }; }
-    for (const [name, fn] of [['list', async () => (await api.listMessages('INBOX', 2)).map(({ unread, folder, hasAttachments, count }) => ({ unread, folder, hasAttachments, count }))],['unread', () => api.unreadCount('INBOX')],
-      ['sent', () => api.listMessages('Sent Messages', 1)], ['trash', () => api.listMessages('Deleted Messages', 1)]]) {
-      try { out[name] = shape(await fn()); } catch (e) { out[name] = 'FAIL ' + e.message; }
+    try {
+      const s = await api.getSession(true);
+      out.session = { ok: true, detail: s.email || '' };
+    } catch (e) {
+      out.session = { ok: false, detail: String(e.message || e) };
+      return out;
     }
+    try {
+      const q = await api.quickStatus('INBOX');
+      out.inbox = { ok: true, detail: String(q.unseen) };
+    } catch (e) { out.inbox = { ok: false, detail: String(e.message || e) }; }
+    try {
+      await Promise.all(['Archive', 'Sent Messages', 'Deleted Messages'].map((f) => api.listMessages(f, 1)));
+      out.folders = { ok: true };
+    } catch (e) { out.folders = { ok: false, detail: String(e.message || e) }; }
     return out;
   },
-  poll: () => poll(),
+  poll: () => poll(true),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
   openWeb: () => chrome.tabs.create({ url: MAIL_URL }),
   list: ({ folder, q }) => api.listMessages(folder, 30, q),

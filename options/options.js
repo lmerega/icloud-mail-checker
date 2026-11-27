@@ -1,26 +1,36 @@
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
-const DEFAULTS = { pollMinutes: 2, notifications: true, badge: true };
+const DEFAULTS = { pollMinutes: 1, notifications: true, badge: true };
+const INTERVALS = [0.5, 1, 2, 5, 10, 15, 30];
+const label = (m) => (m < 1 ? t('secs30') : `${m} min`);
 
 for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
 $('h').textContent = t('appName');
+$('poll').replaceChildren(...INTERVALS.map((m) => { const o = document.createElement('option'); o.value = m; o.textContent = label(m); return o; }));
+
+let flash;
+function saved() {
+  $('msg').textContent = t('saved');
+  clearTimeout(flash);
+  flash = setTimeout(() => { $('msg').textContent = ''; }, 1800);
+}
+
+const nearest = (v) => INTERVALS.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a), INTERVALS[0]);
 
 async function load() {
   const { settings } = await chrome.storage.sync.get('settings');
   const s = { ...DEFAULTS, ...(settings || {}) };
-  $('poll').value = s.pollMinutes;
-  $('notif').checked = s.notifications;
-  $('badge').checked = s.badge;
+  $('poll').value = String(nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes));
+  $('notif').checked = !!s.notifications;
+  $('badge').checked = !!s.badge;
 }
 
 async function save() {
-  const pollMinutes = Math.min(60, Math.max(1, Number($('poll').value) || 2));
   await chrome.storage.sync.set({
-    settings: { pollMinutes, notifications: $('notif').checked, badge: $('badge').checked }
+    settings: { pollMinutes: Number($('poll').value), notifications: $('notif').checked, badge: $('badge').checked }
   });
-  $('msg').textContent = t('saved');
+  saved();
 }
-
 for (const id of ['poll', 'notif', 'badge']) $(id).addEventListener('change', save);
 
 // Export/import: preferences only, never cookies or message data.
@@ -38,17 +48,31 @@ $('file').onchange = async (e) => {
     if (j.app !== 'icloud-mail-checker') throw new Error('format');
     const s = j.settings || {};
     await chrome.storage.sync.set({ settings: {
-      pollMinutes: Math.min(60, Math.max(1, Number(s.pollMinutes) || 2)),
-      notifications: !!s.notifications, badge: !!s.badge
+      pollMinutes: nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes), notifications: !!s.notifications, badge: !!s.badge
     } });
-    await load(); $('msg').textContent = t('saved');
+    await load(); saved();
   } catch { $('msg').textContent = t('importError'); }
 };
 
+// Connection check: plain-language results instead of raw diagnostics.
+const STEPS = [['session', 'connSession'], ['inbox', 'connInbox'], ['folders', 'connFolders']];
 $('diag').onclick = async () => {
-  $('diagOut').textContent = '…';
+  const out = $('diagOut');
+  out.replaceChildren();
   const r = await chrome.runtime.sendMessage({ action: 'diag' });
-  $('diagOut').textContent = JSON.stringify(r.ok ? r.result : r.error, null, 2);
+  const res = r.ok ? r.result : { session: { ok: false, detail: r.error } };
+  for (const [key, msg] of STEPS) {
+    if (!res[key]) continue;
+    const li = document.createElement('li');
+    const mark = document.createElement('span');
+    mark.className = res[key].ok ? 'ok' : 'bad';
+    mark.textContent = res[key].ok ? '✓' : '✕';
+    const text = document.createElement('div');
+    text.textContent = t(msg);
+    if (res[key].detail) { const s = document.createElement('small'); s.textContent = res[key].detail; text.append(s); }
+    li.append(mark, text);
+    out.append(li);
+  }
 };
 
 load();

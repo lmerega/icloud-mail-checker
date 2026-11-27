@@ -181,5 +181,38 @@
   },
   "heroZeroSub": {
     "message": "Nessun nuovo messaggio"
+  },
+  "sectionCheck": {
+    "message": "Controllo della posta"
+  },
+  "secs30": {
+    "message": "30 secondi"
+  },
+  "pollNote": {
+    "message": "iCloud non invia la posta alle estensioni: l'estensione controlla a questo intervallo con una richiesta molto leggera. Più breve significa vedere prima la nuova posta."
+  },
+  "sectionBackup": {
+    "message": "Copia delle impostazioni"
+  },
+  "backupNote": {
+    "message": "Salva solo le preferenze, mai posta o password."
+  },
+  "sectionConn": {
+    "message": "Verifica della connessione"
+  },
+  "connHint": {
+    "message": "Se qualcosa non funziona, apri icloud.com in questo browser, accedi e verifica di nuovo."
+  },
+  "runCheck": {
+    "message": "Verifica ora"
+  },
+  "connSession": {
+    "message": "Accesso a iCloud"
+  },
+  "connInbox": {
+    "message": "La posta in arrivo si legge"
+  },
+  "connFolders": {
+    "message": "Archivio, Inviata e Cestino si leggono"
   }
 }

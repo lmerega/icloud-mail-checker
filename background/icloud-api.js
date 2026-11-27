@@ -104,6 +104,15 @@ export async function listMessages(folder = FOLDERS.inbox, count = 30, query = '
   return (r.threadList || []).map((t) => normalizeThread(t, folder));
 }
 
+/** Very light check: unread count plus the newest thread (id and time). */
+export async function quickStatus(folder = FOLDERS.inbox) {
+  const r = await gatewayPost('/mailws2/v1/thread/search', {
+    responseType: 'THREAD_ID_AND_DATE', includeFolderStatus: true, maxResults: 1, sessionHeaders: SESSION_HEADERS(folder)
+  });
+  const top = r.threadList?.[0];
+  return { unseen: r.folderStatus?.unseenUndeletedMessages ?? 0, topThread: top?.threadId ?? '', topTime: top?.timestamp ?? 0 };
+}
+
 export async function unreadCount(folder = FOLDERS.inbox) {
   const r = await gatewayPost('/mailws2/v1/thread/search', {
     responseType: 'THREAD_ID_AND_DATE', includeFolderStatus: true, maxResults: 1, sessionHeaders: SESSION_HEADERS(folder)

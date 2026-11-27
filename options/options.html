@@ -2,27 +2,52 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Options</title>
-  <style>
-    :root { color-scheme: dark; }
-    body { font: 14px system-ui, sans-serif; background:#16181d; color:#e6e8ec; max-width:520px; margin:24px auto; padding:0 16px; }
-    label { display:block; margin:12px 0; } input[type=number] { width:70px; }
-    button { margin-right:8px; padding:6px 12px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iCloud Mail Checker</title>
+  <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <h1 id="h"></h1>
-  <label><span data-i18n="pollEvery"></span> <input id="poll" type="number" min="1" max="60"> min</label>
-  <label><input id="notif" type="checkbox"> <span data-i18n="notifications"></span></label>
-  <label><input id="badge" type="checkbox"> <span data-i18n="badge"></span></label>
-  <p>
-    <button id="export" data-i18n="export"></button>
-    <button id="import" data-i18n="import"></button>
-    <input id="file" type="file" accept="application/json" hidden>
-  </p>
-  <p><button id="diag">Run diagnostics</button></p>
-  <pre id="diagOut"></pre>
-  <p id="msg"></p>
+  <header class="top">
+    <img class="logo-img" src="../icons/icon-48.png" alt="">
+    <span id="h" class="title"></span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2 data-i18n="sectionCheck"></h2>
+      <div class="row">
+        <label for="poll" data-i18n="pollEvery"></label>
+        <select id="poll"></select>
+      </div>
+      <p class="hint" data-i18n="pollNote"></p>
+      <div class="row">
+        <label for="notif" data-i18n="notifications"></label>
+        <label class="switch"><input id="notif" type="checkbox"><span></span></label>
+      </div>
+      <div class="row">
+        <label for="badge" data-i18n="badge"></label>
+        <label class="switch"><input id="badge" type="checkbox"><span></span></label>
+      </div>
+      <p id="msg" class="saved"></p>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="sectionBackup"></h2>
+      <p class="hint" data-i18n="backupNote"></p>
+      <div class="btns">
+        <button id="export" class="btn" data-i18n="export"></button>
+        <button id="import" class="btn" data-i18n="import"></button>
+        <input id="file" type="file" accept="application/json" hidden>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="sectionConn"></h2>
+      <p class="hint" data-i18n="connHint"></p>
+      <button id="diag" class="btn primary" data-i18n="runCheck"></button>
+      <ul id="diagOut" class="checks"></ul>
+    </section>
+  </main>
   <script type="module" src="options.js"></script>
 </body>
 </html>
