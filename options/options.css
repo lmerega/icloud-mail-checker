@@ -42,3 +42,10 @@ select { background: var(--field); color: var(--text); border: 0; border-radius:
 .checks .ok { color: var(--ok); font-weight: 700; }
 .checks .bad { color: var(--bad); font-weight: 700; }
 .checks small { color: var(--mut); display: block; }
+
+.sounds { display: grid; gap: 6px; margin: 4px 0 0; }
+.snd { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 14px; background: var(--field); }
+.snd label { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+.snd input { accent-color: var(--accent); width: 18px; height: 18px; }
+.snd .btn { padding: 6px 14px; }
+.snd.on { outline: 2px solid var(--accent); }

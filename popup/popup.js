@@ -334,6 +334,7 @@ $('refresh').onclick = async () => { await call({ action: 'poll' }); home(); };
 $('newtab').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('popup/popup.html?tab=1') });
 $('menu-top').onclick = (e) => { e.stopPropagation(); $('menu').hidden = !$('menu').hidden; };
 document.addEventListener('click', () => { $('menu').hidden = true; });
+$('open-icloud').onclick = () => call({ action: 'openWeb' });
 $('m-web').onclick = () => call({ action: 'openWeb' });
 $('m-options').onclick = () => chrome.runtime.openOptionsPage();
 $('signinBtn').onclick = () => call({ action: 'signIn' });

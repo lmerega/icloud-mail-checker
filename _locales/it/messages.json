@@ -262,5 +262,23 @@
   },
   "soundFailed": {
     "message": "Impossibile riprodurre il suono"
+  },
+  "sndDing": {
+    "message": "Ding"
+  },
+  "sndChime": {
+    "message": "Arpeggio"
+  },
+  "sndBell": {
+    "message": "Campana"
+  },
+  "sndPop": {
+    "message": "Pop"
+  },
+  "sndMarimba": {
+    "message": "Marimba"
+  },
+  "sndAlert": {
+    "message": "Allarme"
   }
 }

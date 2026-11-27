@@ -1,7 +1,9 @@
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
-const DEFAULTS = { pollMinutes: 1, notifications: true, badge: true, sound: true, theme: 'auto' };
+const DEFAULTS = { pollMinutes: 1, notifications: true, badge: true, sound: true, soundId: 'ding', theme: 'auto' };
 const THEMES = ['auto', 'light', 'dark'];
+const SOUND_IDS = ['ding', 'chime', 'bell', 'pop', 'marimba', 'alert'];
+const SOUND_NAME = { ding: 'sndDing', chime: 'sndChime', bell: 'sndBell', pop: 'sndPop', marimba: 'sndMarimba', alert: 'sndAlert' };
 const applyTheme = (th) => { if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; };
 const INTERVALS = [0.5, 1, 2, 5, 10, 15, 30];
 const label = (m) => (m < 1 ? t('secs30') : `${m} min`);
@@ -9,6 +11,34 @@ const label = (m) => (m < 1 ? t('secs30') : `${m} min`);
 for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
 $('h').textContent = t('appName');
 $('poll').replaceChildren(...INTERVALS.map((m) => { const o = document.createElement('option'); o.value = m; o.textContent = label(m); return o; }));
+
+const picker = $('sounds');
+for (const id of SOUND_IDS) {
+  const row = document.createElement('div');
+  row.className = 'snd';
+  const lab = document.createElement('label');
+  const radio = document.createElement('input');
+  radio.type = 'radio'; radio.name = 'snd'; radio.value = id;
+  const name = document.createElement('span');
+  name.textContent = t(SOUND_NAME[id]);
+  lab.append(radio, name);
+  const play = document.createElement('button');
+  play.className = 'btn';
+  play.textContent = '▶';
+  play.title = t('testSound');
+  play.onclick = async () => {
+    $('soundMsg').textContent = '…';
+    const r = await chrome.runtime.sendMessage({ action: 'testSound', sound: id });
+    $('soundMsg').textContent = r.ok ? t('soundPlayed') : `${t('soundFailed')}: ${r.error}`;
+  };
+  radio.addEventListener('change', save);
+  row.append(lab, play);
+  picker.append(row);
+}
+const chosenSound = () => (document.querySelector('input[name=snd]:checked') || {}).value || 'ding';
+const paintSounds = (id) => {
+  for (const r of picker.querySelectorAll('input')) { r.checked = r.value === id; r.closest('.snd').classList.toggle('on', r.checked); }
+};
 
 let flash;
 function saved() {
@@ -26,24 +56,20 @@ async function load() {
   $('notif').checked = !!s.notifications;
   $('badge').checked = !!s.badge;
   $('sound').checked = !!s.sound;
+  paintSounds(SOUND_IDS.includes(s.soundId) ? s.soundId : 'ding');
   $('theme').value = THEMES.includes(s.theme) ? s.theme : 'auto';
   applyTheme($('theme').value);
 }
 
 async function save() {
   await chrome.storage.sync.set({
-    settings: { pollMinutes: Number($('poll').value), notifications: $('notif').checked, badge: $('badge').checked, sound: $('sound').checked, theme: $('theme').value }
+    settings: { pollMinutes: Number($('poll').value), notifications: $('notif').checked, badge: $('badge').checked, sound: $('sound').checked, soundId: chosenSound(), theme: $('theme').value }
   });
+  paintSounds(chosenSound());
   saved();
 }
 for (const id of ['poll', 'notif', 'badge', 'sound', 'theme']) $(id).addEventListener('change', save);
 $('theme').addEventListener('change', () => applyTheme($('theme').value));
-
-$('testSound').onclick = async () => {
-  $('soundMsg').textContent = '…';
-  const r = await chrome.runtime.sendMessage({ action: 'testSound' });
-  $('soundMsg').textContent = r.ok ? t('soundPlayed') : `${t('soundFailed')}: ${r.error}`;
-};
 
 // Export/import: preferences only, never cookies or message data.
 $('export').onclick = async () => {
@@ -60,7 +86,7 @@ $('file').onchange = async (e) => {
     if (j.app !== 'icloud-mail-checker') throw new Error('format');
     const s = j.settings || {};
     await chrome.storage.sync.set({ settings: {
-      pollMinutes: nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes), notifications: !!s.notifications, badge: !!s.badge, sound: s.sound !== false, theme: THEMES.includes(s.theme) ? s.theme : 'auto'
+      pollMinutes: nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes), notifications: !!s.notifications, badge: !!s.badge, sound: s.sound !== false, soundId: SOUND_IDS.includes(s.soundId) ? s.soundId : 'ding', theme: THEMES.includes(s.theme) ? s.theme : 'auto'
     } });
     await load(); saved();
   } catch { $('msg').textContent = t('importError'); }

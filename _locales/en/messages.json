@@ -262,5 +262,23 @@
   },
   "soundFailed": {
     "message": "Could not play the sound"
+  },
+  "sndDing": {
+    "message": "Ding"
+  },
+  "sndChime": {
+    "message": "Chime"
+  },
+  "sndBell": {
+    "message": "Bell"
+  },
+  "sndPop": {
+    "message": "Pop"
+  },
+  "sndMarimba": {
+    "message": "Marimba"
+  },
+  "sndAlert": {
+    "message": "Alert"
   }
 }

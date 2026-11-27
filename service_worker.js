@@ -4,6 +4,18 @@ import { findVerificationCode } from './lib/codes.js';
 
 const MAIL_URL = 'https://www.icloud.com/mail/';
 
+// Reuse an iCloud Mail tab if one is already open, otherwise open a new one.
+async function openMail() {
+  const tabs = await chrome.tabs.query({ url: 'https://www.icloud.com/mail*' });
+  if (tabs.length) {
+    await chrome.tabs.update(tabs[0].id, { active: true });
+    await chrome.windows.update(tabs[0].windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url: MAIL_URL });
+  }
+}
+chrome.commands.onCommand.addListener((c) => { if (c === 'open-mail') openMail(); });
+
 async function init() {
   await api.installHeaderRules();
   await scheduleAlarm();
@@ -13,7 +25,7 @@ async function init() {
 chrome.runtime.onInstalled.addListener(init);
 chrome.runtime.onStartup.addListener(init);
 chrome.alarms.onAlarm.addListener((a) => { if (a.name === ALARM) poll(); });
-chrome.notifications.onClicked.addListener(() => chrome.tabs.create({ url: MAIL_URL }));
+chrome.notifications.onClicked.addListener(() => openMail());
 chrome.storage.onChanged.addListener((c, area) => {
   if (area === 'sync' && c.settings) scheduleAlarm();
 });
@@ -39,11 +51,11 @@ const actions = {
     } catch (e) { out.folders = { ok: false, detail: String(e.message || e) }; }
     return out;
   },
-  testSound: () => playDing().then(() => ({ played: true })),
+  testSound: ({ sound }) => playDing(sound).then(() => ({ played: true })),
   emptyTrash: () => api.emptyFolder('Deleted Messages'),
   poll: () => poll(true),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
-  openWeb: () => chrome.tabs.create({ url: MAIL_URL }),
+  openWeb: () => openMail(),
   list: ({ folder, q }) => api.listMessages(folder, 30, q),
   send: ({ to, subject, body, html }) => api.sendMessage({ to, subject, body, html }),
   async get({ folder, uid }) {

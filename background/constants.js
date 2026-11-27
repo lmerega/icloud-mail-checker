@@ -21,5 +21,6 @@ export const DEFAULTS = {
   notifications: true,
   badge: true,
   sound: true,
+  soundId: 'ding',
   theme: 'auto'
 };

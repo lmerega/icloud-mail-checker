@@ -15,18 +15,18 @@ export async function scheduleAlarm() {
   await chrome.alarms.create(ALARM, { periodInMinutes: Math.max(0.5, Number(s.pollMinutes) || DEFAULTS.pollMinutes) });
 }
 
-export async function playDing() {
+export async function playDing(sound = 'ding') {
   const ctxs = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
   if (!ctxs.length) {
     await chrome.offscreen.createDocument({
       url: 'offscreen/offscreen.html', reasons: ['AUDIO_PLAYBACK'], justification: 'Play a sound when new mail arrives'
     });
   }
-  await chrome.runtime.sendMessage({ target: 'offscreen', type: 'ding' });
+  await chrome.runtime.sendMessage({ target: 'offscreen', type: 'ding', sound });
 }
 
-async function ding() {
-  try { await playDing(); await chrome.storage.local.remove('soundError'); }
+async function ding(sound) {
+  try { await playDing(sound); await chrome.storage.local.remove('soundError'); }
   catch (e) { await chrome.storage.local.set({ soundError: String(e.message || e) }); }
 }
 
@@ -58,7 +58,7 @@ export async function poll(force = false) {
     const { seen = [], primed = false } = await chrome.storage.local.get(['seen', 'primed']);
     const fresh = unread.filter((m) => !seen.includes(m.uid));
     const settings = await getSettings();
-    if (primed && fresh.length && settings.sound) await ding();
+    if (primed && fresh.length && settings.sound) await ding(settings.soundId);
     if (settings.notifications && primed && fresh.length) {
       for (const m of fresh.slice(0, 5)) {
         const code = findVerificationCode(`${m.subject} ${m.preview}`);

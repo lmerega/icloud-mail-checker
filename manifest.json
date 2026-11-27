@@ -24,5 +24,11 @@
     "default_popup": "popup/popup.html"
   },
   "options_ui": { "page": "options/options.html", "open_in_tab": true },
+  "commands": {
+    "open-mail": {
+      "suggested_key": { "default": "Alt+Shift+M" },
+      "description": "__MSG_openICloudMail__"
+    }
+  },
   "minimum_chrome_version": "121"
 }
