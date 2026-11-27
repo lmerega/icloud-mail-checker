@@ -32,6 +32,6 @@ test('manifest and locales are consistent', () => {
 
 test('parses thread digests', () => {
   assert.deepEqual(parseSender('"Acme & Co." <a@x.invalid>'), { name: 'Acme & Co.', address: 'a@x.invalid' });
-  const m = normalizeThread({ threadId: 't1', senders: ['B <b@x.invalid>'], flags: ['\Seen'], timestamp: 0 }, 'INBOX');
+  const m = normalizeThread({ threadId: 't1', senders: ['B <b@x.invalid>'], flags: ['\\Seen'], timestamp: 0 }, 'INBOX');
   assert.equal(m.unread, false);
 });

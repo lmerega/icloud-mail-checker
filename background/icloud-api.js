@@ -125,8 +125,8 @@ export function normalizeThread(t, folder) {
     from: snd.name || snd.address, fromAddress: snd.address,
     subject: t.subject || '', preview: t.preview || '',
     date: t.timestamp ? new Date(t.timestamp).toISOString() : null,
-    unread: !flags.includes('\Seen'), starred: flags.includes('\Flagged'),
-    hasAttachments: flags.includes('\HasAttachment'), count: t.count || 1
+    unread: !flags.includes('\\Seen'), starred: flags.includes('\\Flagged'),
+    hasAttachments: flags.includes('\\HasAttachment'), count: t.count || 1
   };
 }
 
