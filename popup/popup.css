@@ -98,3 +98,21 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .msg .mbody { border-radius: 0 0 20px 20px; overflow: hidden; max-height: 520px; overflow-y: auto; }
 .msg.single .mbody { border-radius: 20px; }
 .quote { border-radius: 14px; overflow: hidden; max-height: 220px; overflow-y: auto; opacity: .92; }
+
+/* composer, mail-app style */
+.comp-top { display: flex; align-items: center; gap: 2px; padding: 10px 14px; position: sticky; top: 0; z-index: 2; background: var(--bg); }
+.icon.round { background: var(--card); box-shadow: var(--glow); }
+.send-round { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { .send-round { color: #1b1b1b; } }
+.linkrow { display: flex; gap: 8px; padding: 0 18px 8px; }
+.linkrow input { flex: 1; padding: 8px 12px; border-radius: 8px; border: 0; background: var(--card); color: var(--text); font: inherit; }
+.comp-rows { padding: 0 18px; }
+.crow { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); min-height: 42px; }
+.crow > span { color: var(--mut); min-width: 58px; }
+.crow input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; font-size: 15px; }
+.comp-body { padding: 12px 18px 24px; }
+.editor { min-height: 90px; outline: none; font-size: 15px; line-height: 1.45; word-break: break-word; }
+.editor a { color: var(--accent); }
+.qwrap { margin-top: 14px; border-left: 2px solid #6b6bd6; padding-left: 14px; }
+.attrib { color: #6b6bd6; margin-bottom: 8px; }
+.qwrap .quote { border-radius: 10px; max-height: none; overflow: hidden; opacity: 1; }

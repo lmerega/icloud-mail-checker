@@ -71,20 +71,35 @@
   </section>
 
   <section id="v-composer" class="view" hidden>
-    <div class="toolbar">
-      <button class="icon" id="c-back" data-icon="back" data-i18n-title="back"></button>
-      <strong class="c-title" data-i18n="composeTitle"></strong>
+    <div class="comp-top">
+      <button class="icon round" id="c-back" data-icon="close" data-i18n-title="back"></button>
       <span class="spacer"></span>
-      <button class="primary" id="c-send" data-i18n="send"></button>
+      <button class="icon" id="f-undo" data-icon="undo" data-i18n-title="undo"></button>
+      <button class="icon" id="f-redo" data-icon="redo" data-i18n-title="redo"></button>
+      <button class="icon" id="f-bold" data-icon="bold" data-i18n-title="bold"></button>
+      <button class="icon" id="f-italic" data-icon="italic" data-i18n-title="italic"></button>
+      <button class="icon" id="f-underline" data-icon="underline" data-i18n-title="underline"></button>
+      <button class="icon" id="f-list" data-icon="list" data-i18n-title="list"></button>
+      <button class="icon" id="f-link" data-icon="link" data-i18n-title="link"></button>
+      <span class="spacer"></span>
+      <button class="send-round" id="c-send" data-icon="send" data-size="20" data-i18n-title="send"></button>
     </div>
-    <div class="pad">
-      <div class="card form">
-        <input id="c-to" data-i18n-ph="to">
-        <input id="c-subject" data-i18n-ph="subject">
-        <textarea id="c-body"></textarea>
-        <div id="c-quote" class="quote" hidden></div>
-        <div id="c-status" class="addr"></div>
+    <div id="c-linkrow" class="linkrow" hidden>
+      <input id="c-link" placeholder="https://">
+      <button class="primary" id="c-linkok" data-i18n="ok"></button>
+    </div>
+    <div class="comp-rows">
+      <label class="crow"><span data-i18n="toLabel"></span><input id="c-to"></label>
+      <div class="crow"><span data-i18n="fromLabel"></span><b id="c-from"></b></div>
+      <label class="crow"><span data-i18n="subject"></span><input id="c-subject"></label>
+    </div>
+    <div class="comp-body">
+      <div id="c-editor" class="editor" contenteditable="true" spellcheck="true"></div>
+      <div id="c-quote-wrap" class="qwrap" hidden>
+        <div id="c-attrib" class="attrib"></div>
+        <div id="c-quote" class="quote"></div>
       </div>
+      <div id="c-status" class="addr"></div>
     </div>
   </section>
 

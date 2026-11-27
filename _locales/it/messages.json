@@ -139,5 +139,38 @@
   },
   "wrote": {
     "message": "ha scritto"
+  },
+  "attribution": {
+    "message": "Il giorno {date}, {sender} ha scritto:"
+  },
+  "toLabel": {
+    "message": "A:"
+  },
+  "fromLabel": {
+    "message": "Da:"
+  },
+  "undo": {
+    "message": "Annulla"
+  },
+  "redo": {
+    "message": "Ripeti"
+  },
+  "bold": {
+    "message": "Grassetto"
+  },
+  "italic": {
+    "message": "Corsivo"
+  },
+  "underline": {
+    "message": "Sottolineato"
+  },
+  "list": {
+    "message": "Elenco puntato"
+  },
+  "link": {
+    "message": "Link"
+  },
+  "ok": {
+    "message": "OK"
   }
 }

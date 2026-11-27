@@ -1,6 +1,6 @@
 import { icon, paintIcons } from './icons.js';
 import { quoteForReply } from '../lib/text.js';
-import { renderMail, buildReplyHtml } from '../lib/sanitize.js';
+import { renderMail, buildReplyHtml, sanitizeHtml } from '../lib/sanitize.js';
 
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
@@ -208,38 +208,71 @@ $('act-archive').onclick = act('archive');
 $('act-trash').onclick = act('trash');
 
 /* ---------- composer ---------- */
-let replyCtx = null; // { html, who } when answering an HTML message
+// One editable area (like a mail app): you type on top, the original stays below as a quote.
+let replyCtx = null; // { html, text, attribution } when answering a message
+let savedRange = null;
+const editor = () => $('c-editor');
 
-function compose(reply) {
+function exec(cmd, value) {
+  editor().focus();
+  document.execCommand(cmd, false, value);
+}
+for (const [id, cmd] of [['f-undo', 'undo'], ['f-redo', 'redo'], ['f-bold', 'bold'], ['f-italic', 'italic'], ['f-underline', 'underline'], ['f-list', 'insertUnorderedList']]) {
+  $(id).onmousedown = (e) => { e.preventDefault(); exec(cmd); };
+}
+$('f-link').onmousedown = (e) => {
+  e.preventDefault();
+  const sel = getSelection();
+  savedRange = sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+  const row = $('c-linkrow');
+  row.hidden = !row.hidden;
+  if (!row.hidden) setTimeout(() => $('c-link').focus(), 0);
+};
+$('c-linkok').onclick = () => {
+  const u = $('c-link').value.trim();
+  $('c-linkrow').hidden = true;
+  if (!/^(https?:\/\/|mailto:)/i.test(u)) return;
+  editor().focus();
+  if (savedRange) { const s = getSelection(); s.removeAllRanges(); s.addRange(savedRange); }
+  const s = getSelection();
+  if (s.isCollapsed) exec('insertHTML', `<a href="${u.replace(/"/g, '&quot;')}">${u.replace(/[&<>]/g, '')}</a>`);
+  else exec('createLink', u);
+  $('c-link').value = '';
+};
+
+async function compose(reply) {
   replyCtx = null;
+  const { state } = await chrome.storage.local.get('state');
+  $('c-from').textContent = state?.email || '';
   $('c-to').value = reply ? reply.fromAddress : '';
   $('c-subject').value = reply ? (/^re:/i.test(reply.subject) ? reply.subject : `Re: ${reply.subject}`) : '';
-  const who = reply ? `${reply.date ? new Date(reply.date).toLocaleString() : ''}, ${reply.from} ${t('wrote')}:` : '';
-  const quote = $('c-quote');
-  quote.hidden = true;
-  if (reply && reply.html) {
-    // HTML original: keep it as an HTML quote (shown below, sent as rich content).
-    replyCtx = { html: reply.html, who, text: reply.text };
-    $('c-body').value = '';
-    renderMail(quote, reply.html);
-    quote.hidden = false;
-  } else {
-    $('c-body').value = reply && reply.text ? `\n\n${who}\n${quoteForReply(reply.text)}` : '';
-  }
+  editor().innerHTML = '<div><br></div>';
+  $('c-linkrow').hidden = true;
   $('c-status').textContent = '';
+  const wrap = $('c-quote-wrap');
+  wrap.hidden = true;
+  if (reply && (reply.html || reply.text)) {
+    const date = reply.date ? new Date(reply.date).toLocaleString([], { dateStyle: 'long', timeStyle: 'short' }) : '';
+    const attribution = t('attribution').replace('{date}', date).replace('{sender}', `${reply.from} <${reply.fromAddress}>`);
+    replyCtx = { html: reply.html, text: reply.text || '', attribution };
+    $('c-attrib').textContent = attribution;
+    renderMail($('c-quote'), reply.html, reply.text);
+    wrap.hidden = false;
+  }
   show('v-composer');
-  (reply ? $('c-body') : $('c-to')).focus();
+  (reply ? editor() : $('c-to')).focus();
 }
 
 $('c-send').onclick = async () => {
   const to = $('c-to').value.split(/[,;\s]+/).filter(Boolean);
-  if (!to.length) { $('c-status').textContent = t('to'); return; }
+  if (!to.length) { $('c-status').textContent = t('to'); $('c-to').focus(); return; }
   $('c-send').disabled = true;
-  const typed = $('c-body').value;
-  const msg = { action: 'send', to, subject: $('c-subject').value, body: typed };
+  const userHtml = sanitizeHtml(editor().innerHTML).body.innerHTML;
+  const userText = editor().innerText.trim();
+  const msg = { action: 'send', to, subject: $('c-subject').value, body: userText, html: `<div>${userHtml}</div>` };
   if (replyCtx) {
-    msg.body = `${typed}\n\n${replyCtx.who}\n${quoteForReply(replyCtx.text)}`;
-    msg.html = buildReplyHtml(typed, replyCtx.who, replyCtx.html);
+    msg.body = `${userText}\n\n${replyCtx.attribution}\n${quoteForReply(replyCtx.text)}`;
+    msg.html = buildReplyHtml(userHtml, replyCtx.attribution, replyCtx);
   }
   const r = await call(msg);
   $('c-send').disabled = false;

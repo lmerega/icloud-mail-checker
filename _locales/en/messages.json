@@ -139,5 +139,38 @@
   },
   "wrote": {
     "message": "wrote"
+  },
+  "attribution": {
+    "message": "On {date}, {sender} wrote:"
+  },
+  "toLabel": {
+    "message": "To:"
+  },
+  "fromLabel": {
+    "message": "From:"
+  },
+  "undo": {
+    "message": "Undo"
+  },
+  "redo": {
+    "message": "Redo"
+  },
+  "bold": {
+    "message": "Bold"
+  },
+  "italic": {
+    "message": "Italic"
+  },
+  "underline": {
+    "message": "Underline"
+  },
+  "list": {
+    "message": "Bulleted list"
+  },
+  "link": {
+    "message": "Link"
+  },
+  "ok": {
+    "message": "OK"
   }
 }
