@@ -2,53 +2,91 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <header>
-    <strong id="title"></strong>
-    <span id="who"></span>
+  <header class="top">
+    <span class="logo">✉</span>
+    <span id="title" class="title"></span>
     <span class="spacer"></span>
-    <button id="refresh" data-i18n-title="refresh">⟳</button>
-    <button id="settings" data-i18n-title="settings">⚙</button>
+    <button class="icon" id="refresh" data-i18n-title="refresh" aria-label="refresh">⟳</button>
+    <button class="icon" id="newtab" data-i18n-title="openTab" aria-label="open in tab">⧉</button>
+    <button class="icon" id="menu-top" data-i18n-title="menu" aria-label="menu">⋮</button>
   </header>
-  <nav id="tabs">
-    <button data-folder="INBOX" class="on" data-i18n="inbox"></button>
-    <button data-folder="Archive" data-i18n="archive"></button>
-    <button data-folder="Sent Messages" data-i18n="sent"></button>
-    <button data-folder="Deleted Messages" data-i18n="trash"></button>
-  </nav>
-  <main id="signin" hidden>
-    <p data-i18n="signInHint"></p>
-    <button id="signinBtn" data-i18n="signIn"></button>
+
+  <div id="menu" class="menu" hidden>
+    <button id="m-web" data-i18n="openICloudMail"></button>
+    <button id="m-options" data-i18n="options"></button>
+  </div>
+
+  <main id="v-accounts" class="view">
+    <div id="signin" class="card" hidden>
+      <p data-i18n="signInHint"></p>
+      <button class="primary" id="signinBtn" data-i18n="signIn"></button>
+    </div>
+    <div id="account" class="card account" hidden>
+      <div class="acc-main" id="acc-open">
+        <div class="acc-email" id="acc-email"></div>
+        <div class="acc-sub" id="acc-sub"></div>
+      </div>
+      <span class="badge" id="acc-badge" hidden></span>
+      <button class="icon" id="acc-compose" data-i18n-title="compose" aria-label="compose">✎</button>
+      <button class="icon" id="acc-search" data-i18n-title="search" aria-label="search">⌕</button>
+      <button class="icon" id="acc-menu" data-i18n-title="menu" aria-label="menu">⋮</button>
+    </div>
   </main>
-  <main id="list"></main>
-  <section id="detail" hidden>
+
+  <main id="v-mailbox" class="view" hidden>
     <div class="bar">
-      <button id="back">←</button>
-      <button id="act-read"></button>
-      <button id="act-star">★</button>
-      <button id="act-archive" data-i18n="archive"></button>
-      <button id="act-trash" data-i18n="trash"></button>
-      <button id="open-web" data-i18n="openInICloud"></button>
+      <button class="icon" id="mb-back" data-i18n-title="back" aria-label="back">←</button>
+      <input id="q" class="search" type="search" data-i18n-ph="search">
+      <button class="icon" id="mb-compose" data-i18n-title="compose" aria-label="compose">✎</button>
     </div>
-    <h2 id="d-subject"></h2>
-    <div id="d-meta"></div>
-    <div id="d-code" hidden></div>
-    
-    <iframe id="d-body" sandbox="" referrerpolicy="no-referrer"></iframe>
-    <ul id="d-att"></ul>
-  </section>
-  <section id="composer" hidden>
-    <input id="c-to" data-i18n-ph="to">
-    <input id="c-subject" data-i18n-ph="subject">
-    <textarea id="c-body"></textarea>
+    <nav id="tabs" class="chips">
+      <button data-folder="INBOX" class="on" data-i18n="inbox"></button>
+      <button data-folder="Archive" data-i18n="archive"></button>
+      <button data-folder="Sent Messages" data-i18n="sent"></button>
+      <button data-folder="Deleted Messages" data-i18n="trash"></button>
+    </nav>
+    <div id="list"></div>
+  </main>
+
+  <section id="v-detail" class="view" hidden>
     <div class="bar">
-      <button id="c-send" data-i18n="send"></button>
-      <button id="c-cancel" data-i18n="cancel"></button>
+      <button class="icon" id="d-back" data-i18n-title="back" aria-label="back">←</button>
+      <button class="icon" id="act-read" aria-label="read">✓</button>
+      <button class="icon" id="act-star" data-i18n-title="star" aria-label="star">☆</button>
+      <button class="icon" id="act-archive" data-i18n-title="archive" aria-label="archive">▤</button>
+      <button class="icon" id="act-trash" data-i18n-title="trash" aria-label="trash">🗑</button>
+      <button class="icon" id="act-reply" data-i18n-title="reply" aria-label="reply">↩</button>
+      <span class="spacer"></span>
+      <button class="icon" id="open-web" data-i18n-title="openInICloud" aria-label="open in iCloud">↗</button>
     </div>
-    <div id="c-status"></div>
+    <div class="pad">
+      <h2 id="d-subject"></h2>
+      <div id="d-meta" class="meta"></div>
+      <div id="d-code" class="code" hidden></div>
+      <iframe id="d-body" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+      <ul id="d-att"></ul>
+    </div>
   </section>
+
+  <section id="v-composer" class="view" hidden>
+    <div class="bar">
+      <button class="icon" id="c-back" data-i18n-title="back" aria-label="back">←</button>
+      <strong data-i18n="composeTitle"></strong>
+      <span class="spacer"></span>
+      <button class="primary" id="c-send" data-i18n="send"></button>
+    </div>
+    <div class="pad">
+      <input id="c-to" data-i18n-ph="to">
+      <input id="c-subject" data-i18n-ph="subject">
+      <textarea id="c-body"></textarea>
+      <div id="c-status" class="meta"></div>
+    </div>
+  </section>
+
   <script type="module" src="popup.js"></script>
 </body>
 </html>

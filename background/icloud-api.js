@@ -93,10 +93,13 @@ export function normalizeThread(t, folder) {
   };
 }
 
-export async function listMessages(folder = FOLDERS.inbox, count = 30) {
-  const r = await gatewayPost('/mailws2/v1/thread/search', {
+export async function listMessages(folder = FOLDERS.inbox, count = 30, query = '') {
+  const body = {
     responseType: 'THREAD_DIGEST', includeFolderStatus: true, maxResults: count, sessionHeaders: SESSION_HEADERS(folder)
-  });
+  };
+  // Verified 2026-11-27: searchType "anyfield" | "from" | "recipient" | "subject".
+  if (query) { body.searchText = query; body.searchType = 'anyfield'; }
+  const r = await gatewayPost('/mailws2/v1/thread/search', body);
   return (r.threadList || []).map((t) => normalizeThread(t, folder));
 }
 
@@ -158,3 +161,15 @@ export const archive = (folder, threadIds) => moveTo(folder, threadIds, FOLDERS.
 export const trash = (folder, threadIds) => gatewayPost('/mailws2/v1/thread/move', {
   moveMethod: 'DELETE', destFolder: FOLDERS.trash, threadIds, sessionHeaders: SESSION_HEADERS(folder)
 });
+
+// Body shape taken from the web app bundle (UNTESTED): POST /mailws2/v1/message/send.
+export async function sendMessage({ to, subject, body }) {
+  const s = await getSession();
+  const from = s.email;
+  if (!from) throw new Error('sender address unknown');
+  const r = await gatewayPost('/mailws2/v1/message/send', {
+    date: new Date().toUTCString().replace('GMT', '-0000'),
+    from, to, subject, textBody: body, htmlBody: '', isHME: false, webmailClientBuild: 'current'
+  });
+  return { id: r.sentMessageGUID ?? null };
+}

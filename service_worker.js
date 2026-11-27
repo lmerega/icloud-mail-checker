@@ -35,7 +35,8 @@ const actions = {
   poll: () => poll(),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
   openWeb: () => chrome.tabs.create({ url: MAIL_URL }),
-  list: ({ folder }) => api.listMessages(folder),
+  list: ({ folder, q }) => api.listMessages(folder, 30, q),
+  send: ({ to, subject, body }) => api.sendMessage({ to, subject, body }),
   async get({ folder, uid }) {
     const m = await api.getMessage(folder, uid);
     m.code = findVerificationCode(`${m.subject} ${m.text}`);

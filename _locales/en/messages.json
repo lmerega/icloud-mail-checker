@@ -100,5 +100,41 @@
   },
   "openInICloud": {
     "message": "Open in iCloud"
+  },
+  "search": {
+    "message": "Search"
+  },
+  "composeTitle": {
+    "message": "New message"
+  },
+  "openTab": {
+    "message": "Open in a tab"
+  },
+  "menu": {
+    "message": "More"
+  },
+  "options": {
+    "message": "Options"
+  },
+  "unreadLabel": {
+    "message": "unread"
+  },
+  "noResults": {
+    "message": "No results"
+  },
+  "sentOk": {
+    "message": "Message sent"
+  },
+  "back": {
+    "message": "Back"
+  },
+  "star": {
+    "message": "Star"
+  },
+  "openICloudMail": {
+    "message": "Open iCloud Mail"
+  },
+  "signedOut": {
+    "message": "Not signed in"
   }
 }

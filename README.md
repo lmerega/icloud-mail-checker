@@ -10,7 +10,9 @@ manage iCloud Mail from the toolbar. Sister project of
 ## Features
 
 - Unread badge and desktop notifications.
-- Folder views (inbox, archive, sent, trash) with sender, subject and preview.
+- Material-style popup (light/dark): account row with unread count, mailbox with folder chips, search, open in a tab.
+- Search (any field) and folder views (inbox, archive, sent, trash).
+- Compose and reply (send payload taken from the web app, not yet exercised on a real mailbox).
 - Verification-code detection with one-click copy.
 - Read messages in the popup (remote content blocked), see attachment names.
 - Mark read/unread, star, archive and delete (payloads from the web app; archive/delete/flag not yet exercised on a real mailbox).
@@ -30,7 +32,7 @@ asked for or stored, and no data passes through a server of this project.
   in `background/constants.js` and `background/icloud-api.js` and may need
   adjusting against a real session.
 - One iCloud session per Chrome profile (cookies), so one account at a time.
-- Composing/replying and attachment download are not available yet (the send API is still unmapped).
+- Attachment download is not available yet.
 - Only the latest message of a conversation is shown.
 
 ## Install from source

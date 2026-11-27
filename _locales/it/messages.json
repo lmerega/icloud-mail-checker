@@ -100,5 +100,41 @@
   },
   "openInICloud": {
     "message": "Apri su iCloud"
+  },
+  "search": {
+    "message": "Cerca"
+  },
+  "composeTitle": {
+    "message": "Nuovo messaggio"
+  },
+  "openTab": {
+    "message": "Apri in una scheda"
+  },
+  "menu": {
+    "message": "Altro"
+  },
+  "options": {
+    "message": "Opzioni"
+  },
+  "unreadLabel": {
+    "message": "non letti"
+  },
+  "noResults": {
+    "message": "Nessun risultato"
+  },
+  "sentOk": {
+    "message": "Messaggio inviato"
+  },
+  "back": {
+    "message": "Indietro"
+  },
+  "star": {
+    "message": "Preferito"
+  },
+  "openICloudMail": {
+    "message": "Apri iCloud Mail"
+  },
+  "signedOut": {
+    "message": "Non connesso"
   }
 }
