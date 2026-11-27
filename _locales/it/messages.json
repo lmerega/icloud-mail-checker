@@ -172,5 +172,14 @@
   },
   "ok": {
     "message": "OK"
+  },
+  "heroZero": {
+    "message": "Tutto letto"
+  },
+  "heroSub": {
+    "message": "Ecco cosa ti aspetta"
+  },
+  "heroZeroSub": {
+    "message": "Nessun nuovo messaggio"
   }
 }

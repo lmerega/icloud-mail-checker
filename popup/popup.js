@@ -55,7 +55,10 @@ async function home() {
   if (!signedIn) return;
   avatar(state.email, $('acc-avatar'));
   $('acc-email').textContent = state.email;
-  $('acc-sub').textContent = `${state.unread || 0} ${t('unreadLabel')}`;
+  const n = state.unread || 0;
+  $('acc-sub').textContent = `${n} ${t('unreadLabel')}`;
+  $('hero-title').textContent = n > 0 ? `${n} ${t('unreadLabel')}` : t('heroZero');
+  $('hero-sub').textContent = n > 0 ? t('heroSub') : t('heroZeroSub');
   await load();
 }
 

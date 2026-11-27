@@ -28,7 +28,8 @@ const i18n = Object.fromEntries(Object.entries(messages).map(([k, v]) => [k, v.m
 
 const bundle = (await build({ entryPoints: [path.join(root, 'popup/popup.js')], bundle: true, format: 'iife', write: false })).outputFiles[0].text;
 const css = read('popup/popup.css');
-const bodyHtml = read('popup/popup.html').match(/<body>([\s\S]*?)<script type="module"/)[1];
+const logo = 'data:image/png;base64,' + fs.readFileSync(path.join(root, 'icons/icon-48.png')).toString('base64');
+const bodyHtml = read('popup/popup.html').match(/<body>([\s\S]*?)<script type="module"/)[1].replace('../icons/icon-48.png', logo);
 const iconSvg = read('design/icon.svg');
 
 /* ---------- synthetic mailbox ---------- */
@@ -81,6 +82,27 @@ window.chrome = {
 
 const LIGHT = ':root{--bg:#f5f5f5;--card:#fff;--text:#333;--mut:#7a7a7a;--accent:#0b57d0;--line:#e2e2e2;--hover:#eaeaea;--icon:#49454f;--unread:#0b57d0;--read-bg:#ebebeb;--glow:0 0 20px 0 rgba(219,219,219,.5);--ring:0 0 0 1px rgba(193,193,193,.6)}';
 const DARK = ':root{--bg:#131314;--card:#232323;--text:#ddd;--mut:#9b9b9b;--accent:#e3e3e3;--line:#3a3a3a;--hover:#333;--icon:#ccc;--unread:#8ab4f8;--read-bg:#1b1b1c;--glow:none;--ring:0 0 0 1px #4a4a4a}';
+// Headless Chrome follows the OS theme; make each scene independent of it by resolving the
+// prefers-color-scheme: dark blocks ourselves (drop them for light, always-apply for dark).
+function forceScheme(source, dark) {
+  const key = '@media (prefers-color-scheme: dark)';
+  let outCss = '';
+  let i = 0;
+  while (i < source.length) {
+    const j = source.indexOf(key, i);
+    if (j < 0) { outCss += source.slice(i); break; }
+    outCss += source.slice(i, j);
+    const open = source.indexOf('{', j);
+    let depth = 0, k = open;
+    for (; k < source.length; k++) {
+      if (source[k] === '{') depth++;
+      else if (source[k] === '}' && --depth === 0) break;
+    }
+    if (dark) outCss += source.slice(open + 1, k);
+    i = k + 1;
+  }
+  return outCss;
+}
 const SCENES = {
   list: { h: 620, act: '' },
   open: { h: 640, act: "document.querySelectorAll('.mail')[1].click();" },
@@ -91,7 +113,7 @@ const SCENES = {
 
 const shot = {};
 for (const [name, s] of Object.entries(SCENES)) {
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}${s.dark ? DARK : LIGHT}</style></head><body>${bodyHtml}`
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${forceScheme(css, !!s.dark)}${s.dark ? DARK : LIGHT}</style></head><body>${bodyHtml}`
     + `<script>${stub}</script><script>${bundle}</script>`
     + `<script>setTimeout(() => { ${s.act} }, 600);</script></body></html>`;
   const file = path.join(work, `${name}.html`);

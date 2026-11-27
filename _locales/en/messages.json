@@ -172,5 +172,14 @@
   },
   "ok": {
     "message": "OK"
+  },
+  "heroZero": {
+    "message": "All caught up"
+  },
+  "heroSub": {
+    "message": "Here is what is waiting for you"
+  },
+  "heroZeroSub": {
+    "message": "No new messages"
   }
 }
