@@ -7,5 +7,9 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "pack": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && git archive --format=zip -o dist/icloud-mail-checker.zip HEAD"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "esbuild": "^0.28.2"
   }
 }

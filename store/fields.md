@@ -15,7 +15,7 @@ Si compila: Descrizione (da store/listing.md), Categoria, icona, screenshot.
 
 Categoria: Produttivita (Productivity)
 Icona dello store: icons/icon-128.png
-Screenshot: almeno 1 da 1280x800 (o 640x400), con dati inventati
+Screenshot e riquadri: gia pronti in store/assets (rigenerabili con: node design/make-store-assets.mjs)
 
 ## 3. Privacy
 
@@ -67,3 +67,9 @@ Vedi store/listing.md, sezione "Description (IT)".
 ## Prima di premere "Invia per la revisione"
 - Prova invio, archivia, elimina, stella e letto/non letto su una mail che non ti serve.
 - Gli screenshot non devono mostrare posta vera.
+
+## Immagini pronte (store/assets)
+- Screenshot 1280x800: screenshot-1-list, -2-open, -3-thread, -4-reply, -5-dark (PNG 24 bit, senza trasparenza)
+- Riquadro promozionale piccolo 440x280: promo-small-440x280.png
+- Riquadro promozionale marquee 1400x560: promo-marquee-1400x560.png
+Dati inventati (.invalid), nessuna posta reale.
