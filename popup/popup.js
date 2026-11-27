@@ -1,4 +1,3 @@
-import { findVerificationCode } from '../lib/codes.js';
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
 const call = (m) => chrome.runtime.sendMessage(m);
@@ -45,43 +44,53 @@ async function load() {
   $('who').textContent = state?.email || '';
 }
 
-function open(m) {
+const CSP = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">";
+const BASE = '<base target="_blank"><style>body{font:13px sans-serif;margin:8px;word-wrap:break-word}</style>';
+
+async function open(m) {
   current = m;
   $('d-subject').textContent = m.subject;
   $('d-meta').textContent = `${m.from} <${m.fromAddress}> · ${m.date ? new Date(m.date).toLocaleString() : ''}`;
-  $('d-body').srcdoc = `<pre style="white-space:pre-wrap;font:13px sans-serif">${esc(m.preview)}</pre>`;
-  const code = findVerificationCode(`${m.subject} ${m.preview}`);
-  const box = $('d-code');
-  box.hidden = !code;
-  if (code) {
-    box.textContent = `${t('codeLabel')}: ${code} `;
+  $('d-body').srcdoc = `<pre style="font:13px sans-serif">${esc(m.preview)}</pre>`;
+  $('d-code').hidden = true;
+  $('d-att').replaceChildren();
+  $('act-read').textContent = m.unread ? t('markRead') : t('markUnread');
+  show('detail');
+  const r = await call({ action: 'get', folder: m.folder, uid: m.uid });
+  if (current !== m || !r.ok) { if (!r.ok) $('d-meta').textContent += ` — ${r.error}`; return; }
+  const full = r.result;
+  $('d-body').srcdoc = full.html
+    ? `${CSP}${BASE}${full.html}`
+    : `${CSP}${BASE}<pre style="white-space:pre-wrap;font:13px sans-serif">${esc(full.text)}</pre>`;
+  if (full.code) {
+    const box = $('d-code');
+    box.hidden = false;
+    box.textContent = `${t('codeLabel')}: ${full.code} `;
     const c = document.createElement('button'); c.textContent = t('copy');
-    c.onclick = () => navigator.clipboard.writeText(code);
+    c.onclick = () => navigator.clipboard.writeText(full.code);
     box.append(c);
   }
-  $('d-invite').hidden = true;
-  $('d-att').replaceChildren();
-  show('detail');
+  $('d-att').replaceChildren(...full.attachments.map((a) => {
+    const li = document.createElement('li');
+    li.textContent = `${a.name} (${Math.round((a.size || 0) / 1024)} KB)`;
+    return li;
+  }));
 }
 
-function renderInvite(box, inv) {
-  box.textContent = `${inv.summary} — ${inv.start ? new Date(inv.start).toLocaleString() : ''} `;
-  for (const [label, ps] of [['accept', 'ACCEPTED'], ['tentative', 'TENTATIVE'], ['decline', 'DECLINED']]) {
-    const b = document.createElement('button'); b.textContent = t(label);
-    b.onclick = async () => {
-      const { state } = await chrome.storage.local.get('state');
-      const r = await call({ action: 'rsvp', invitation: inv, partstat: ps, attendee: state?.email, to: inv.organizer });
-      b.textContent = r.ok ? '✓' : '✗';
-    };
-    box.append(b);
-  }
-}
+const act = (name, extra = {}) => async () => {
+  const r = await call({ action: name, folder: current.folder, uids: [current.uid], ...extra });
+  if (r.ok) load(); else $('d-meta').textContent = r.error;
+};
 
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 $('back').onclick = load;
 $('refresh').onclick = load;
 $('settings').onclick = () => chrome.runtime.openOptionsPage();
 $('signinBtn').onclick = () => call({ action: 'signIn' });
+$('act-read').onclick = () => act('read', { read: !!current.unread })();
+$('act-star').onclick = () => act('star', { on: !current.starred })();
+$('act-archive').onclick = act('archive');
+$('act-trash').onclick = act('trash');
 $('open-web').onclick = () => call({ action: 'openWeb' });
 
 for (const b of document.querySelectorAll('#tabs button')) {

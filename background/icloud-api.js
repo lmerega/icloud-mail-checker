@@ -1,11 +1,8 @@
-import { SETUP_URL, WEB_ORIGIN, CLIENT, METHODS, FOLDERS } from './constants.js';
+import { SETUP_URL, WEB_ORIGIN, CLIENT, FOLDERS } from './constants.js';
 
 let session = null; // { dsid, mailUrl, email, name, at }
 
 export class AuthError extends Error {}
-
-// Folder ids are sent as "folder:<name>" (confirmed from the web app bundle, 2026-11-27).
-const fid = (n) => (n.startsWith("folder:") ? n : "folder:" + n);
 
 function qs(extra = {}) {
   return new URLSearchParams({ ...CLIENT, ...extra }).toString();
@@ -56,40 +53,6 @@ export async function getSession(force = false) {
 }
 
 export function clearSession() { session = null; }
-
-export const rawRpc = (path, method, params) => rpc({ path, method }, params);
-
-async function rpc(def, params = {}) {
-  const s = await getSession();
-  const url = `${s.mailUrl}${def.path}?${qs({ dsid: s.dsid, method: def.method })}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: def.method, params })
-  });
-  if (res.status === 401 || res.status === 421) { clearSession(); throw new AuthError('session expired'); }
-  if (!res.ok) throw new Error(`${def.path} ${res.status}`);
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.message || 'rpc error');
-  return json.result;
-}
-
-export function normalizeMessage(m, folder) {
-  const flags = m.flags || [];
-  return {
-    uid: String(m.uid ?? m.id),
-    folder,
-    from: m.from?.[0]?.name || m.from?.[0]?.address || m.from || '',
-    fromAddress: m.from?.[0]?.address || '',
-    subject: m.subject || '',
-    preview: m.preview || m.snippet || '',
-    date: m.date ? new Date(m.date).toISOString() : null,
-    unread: !flags.includes('\\Seen'),
-    starred: flags.includes('\\Flagged'),
-    hasAttachments: !!(m.attachments?.length || m.hasAttachments)
-  };
-}
 
 // Verified 2026-11-27 against the live web app: POST {mccgateway}/mailws2/v1/thread/search
 // (application/json). Folder ids are plain IMAP names ("INBOX", "Archive").
@@ -144,30 +107,54 @@ export async function unreadCount(folder = FOLDERS.inbox) {
   return r.folderStatus?.unseenUndeletedMessages ?? 0;
 }
 
-export async function getMessage(folder, uid) {
-  const m = await rpc(METHODS.getMessage, { guid: fid(folder), uid });
+// Verified 2026-11-27 (response shapes, read-only): thread/get -> messageMetadataList[{uid, parts[...]}],
+// message/get {uid, parts:[partId], dontMarkAsRead} -> parts[{content}] (already decoded).
+// UNTESTED against a real mailbox (taken from the web app bundle): thread/flag and thread/move payloads.
+const stripTags = (h) => h
+  .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
+  .replace(/<[^>]+>/g, ' ')
+  .replace(/&nbsp;/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+export async function getMessage(folder, threadId) {
+  const sh = SESSION_HEADERS(folder);
+  const t = await gatewayPost('/mailws2/v1/thread/get', { threadId, sessionHeaders: sh });
+  const list = t.messageMetadataList || [];
+  const m = list[list.length - 1];
+  if (!m) throw new Error('empty thread');
+  const bodyParts = (m.parts || []).filter((p) => !p.isAttach && /^text\/(html|plain)$/i.test(p.contentType));
+  const html = bodyParts.find((p) => /html/i.test(p.contentType)) || null;
+  const chosen = html || bodyParts[0];
+  let content = '';
+  if (chosen) {
+    const r = await gatewayPost('/mailws2/v1/message/get', {
+      uid: m.uid, parts: [chosen.partId], dontMarkAsRead: true, sessionHeaders: sh
+    });
+    content = r.parts?.[0]?.content || '';
+  }
+  const snd = parseSender((m.from || [])[0]);
   return {
-    ...normalizeMessage(m, folder),
-    to: m.to || [],
-    cc: m.cc || [],
-    html: m.html || '',
-    text: m.text || '',
-    messageId: m.messageId || '',
-    attachments: (m.attachments || []).map((a) => ({ name: a.name, size: a.size, url: a.url, type: a.type })),
-    calendar: m.calendar || null
+    uid: String(threadId), threadId: String(threadId), folder,
+    from: snd.name || snd.address, fromAddress: snd.address,
+    subject: m.subject || '', date: m.date ? new Date(m.date).toISOString() : null,
+    unread: !(m.flags || []).includes('\\Seen'),
+    to: m.to || [], cc: m.cc || [], messageId: m.messageId || '',
+    html: html ? content : '', text: html ? stripTags(content) : content,
+    attachments: (m.parts || []).filter((p) => p.isAttach).map((p) => ({ name: p.name || p.partId, size: p.size, type: p.contentType })),
+    messages: list.length
   };
 }
 
-export const markRead = (folder, uids, read = true) =>
-  rpc(METHODS.flag, { guid: fid(folder), uids, flag: '\\Seen', set: read });
-export const star = (folder, uids, on = true) =>
-  rpc(METHODS.flag, { guid: fid(folder), uids, flag: '\\Flagged', set: on });
-export const moveTo = (folder, uids, dest) =>
-  rpc(METHODS.move, { guid: fid(folder), uids, destGuid: fid(dest) });
-export const archive = (folder, uids) => moveTo(folder, uids, FOLDERS.archive);
-export const trash = (folder, uids) => moveTo(folder, uids, FOLDERS.trash);
-export const remove = (folder, uids) => rpc(METHODS.remove, { folder: fid(folder), uids, rollbackslot: null });
-
-export function sendMessage({ to, cc = [], subject, body, inReplyTo = '', attachments = [] }) {
-  return rpc(METHODS.send, { to, cc, subject, textBody: body, inReplyTo, attachments });
-}
+const flagThreads = (folder, threadIds, flag, on) => gatewayPost('/mailws2/v1/thread/flag', {
+  method: on ? 'ADD' : 'REMOVE', flags: [flag], threadIds, sessionHeaders: SESSION_HEADERS(folder)
+});
+export const markRead = (folder, threadIds, read = true) => flagThreads(folder, threadIds, 'SEEN', read);
+export const star = (folder, threadIds, on = true) => flagThreads(folder, threadIds, 'FLAGGED', on);
+export const moveTo = (folder, threadIds, dest) => gatewayPost('/mailws2/v1/thread/move', {
+  moveMethod: 'MOVE', destFolder: dest, threadIds, sessionHeaders: SESSION_HEADERS(folder)
+});
+export const archive = (folder, threadIds) => moveTo(folder, threadIds, FOLDERS.archive);
+export const trash = (folder, threadIds) => gatewayPost('/mailws2/v1/thread/move', {
+  moveMethod: 'DELETE', destFolder: FOLDERS.trash, threadIds, sessionHeaders: SESSION_HEADERS(folder)
+});

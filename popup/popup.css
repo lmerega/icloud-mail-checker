@@ -1,7 +1,7 @@
 :root { color-scheme: dark; --bg:#16181d; --fg:#e6e8ec; --mut:#8b93a1; --acc:#2f80ed; --line:#262a33; }
 * { box-sizing: border-box; }
 body { margin:0; width:400px; min-height:200px; max-height:580px; overflow:auto; background:var(--bg); color:var(--fg); font:13px system-ui, sans-serif; }
-header, nav, .bar { display:flex; gap:6px; align-items:center; padding:8px 10px; border-bottom:1px solid var(--line); }
+header, nav, .bar { flex-wrap:wrap; display:flex; gap:6px; align-items:center; padding:8px 10px; border-bottom:1px solid var(--line); }
 .spacer { flex:1; } #who { color:var(--mut); font-size:11px; }
 button { background:#232733; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:4px 8px; cursor:pointer; }
 button:hover, nav .on { background:var(--acc); border-color:var(--acc); }

@@ -1,7 +1,6 @@
 import * as api from './background/icloud-api.js';
 import { ALARM, poll, scheduleAlarm } from './background/poller.js';
 import { findVerificationCode } from './lib/codes.js';
-import { parseInvitation, buildReply } from './lib/ics.js';
 
 const MAIL_URL = 'https://www.icloud.com/mail/';
 
@@ -27,7 +26,7 @@ const actions = {
     const out = {};
     try { const s = await api.getSession(true); out.session = { mail: s.mailUrl.replace(/p\d+/, 'pNN'), hasDsid: !!s.dsid }; }
     catch (e) { return { session: 'FAIL ' + e.message }; }
-    for (const [name, fn] of [['list', () => api.listMessages('INBOX', 2)],['unread', () => api.unreadCount('INBOX')],
+    for (const [name, fn] of [['list', async () => (await api.listMessages('INBOX', 2)).map(({ unread, folder, hasAttachments, count }) => ({ unread, folder, hasAttachments, count }))],['unread', () => api.unreadCount('INBOX')],
       ['sent', () => api.listMessages('Sent Messages', 1)], ['trash', () => api.listMessages('Deleted Messages', 1)]]) {
       try { out[name] = shape(await fn()); } catch (e) { out[name] = 'FAIL ' + e.message; }
     }
@@ -40,19 +39,12 @@ const actions = {
   async get({ folder, uid }) {
     const m = await api.getMessage(folder, uid);
     m.code = findVerificationCode(`${m.subject} ${m.text}`);
-    if (m.calendar) m.invitation = parseInvitation(m.calendar);
     return m;
   },
   read: ({ folder, uids, read }) => api.markRead(folder, uids, read),
   star: ({ folder, uids, on }) => api.star(folder, uids, on),
   archive: ({ folder, uids }) => api.archive(folder, uids),
   trash: ({ folder, uids }) => api.trash(folder, uids),
-  move: ({ folder, uids, dest }) => api.moveTo(folder, uids, dest),
-  send: (p) => api.sendMessage(p),
-  async rsvp({ invitation, partstat, attendee, to }) {
-    const ics = buildReply(invitation, partstat, attendee);
-    return api.sendMessage({ to: [to], subject: `Re: ${invitation.summary}`, body: '', attachments: [{ name: 'reply.ics', type: 'text/calendar; method=REPLY', content: ics }] });
-  }
 };
 
 chrome.runtime.onMessage.addListener((msg, _s, send) => {

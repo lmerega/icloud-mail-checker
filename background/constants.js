@@ -16,16 +16,6 @@ export const FOLDERS = {
   trash: 'Deleted Messages',
   sent: 'Sent Messages'
 };
-// JSON-RPC style method names used by the mail web service.
-export const METHODS = {
-  listFolders: { path: '/wm/folder', method: 'list' },
-  listMessages: { path: '/wm/message', method: 'list' },
-  getMessage: { path: '/wm/message', method: 'get' },
-  move: { path: '/wm/message', method: 'move' },
-  remove: { path: '/wm/message', method: 'delete' },
-  flag: { path: '/wm/message', method: 'flag' },
-  send: { path: '/wm/message', method: 'send' }
-};
 export const DEFAULTS = {
   pollMinutes: 2,
   notifications: true,
