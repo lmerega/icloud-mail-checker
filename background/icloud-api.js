@@ -4,6 +4,9 @@ let session = null; // { dsid, mailUrl, email, name, at }
 
 export class AuthError extends Error {}
 
+// Folder ids are sent as "folder:<name>" (confirmed from the web app bundle, 2026-11-27).
+const fid = (n) => (n.startsWith("folder:") ? n : "folder:" + n);
+
 function qs(extra = {}) {
   return new URLSearchParams({ ...CLIENT, ...extra }).toString();
 }
@@ -87,13 +90,13 @@ export function normalizeMessage(m, folder) {
 
 export async function listMessages(folder = FOLDERS.inbox, count = 30) {
   const r = await rpc(METHODS.listMessages, {
-    guid: folder, sorttype: 'Date', sortorder: 'descending', startindex: 1, count
+    guid: fid(folder), sorttype: 'Date', sortorder: 'descending', startindex: 1, count
   });
   return (r?.messages || r || []).map((m) => normalizeMessage(m, folder));
 }
 
 export async function getMessage(folder, uid) {
-  const m = await rpc(METHODS.getMessage, { guid: folder, uid });
+  const m = await rpc(METHODS.getMessage, { guid: fid(folder), uid });
   return {
     ...normalizeMessage(m, folder),
     to: m.to || [],
@@ -107,14 +110,14 @@ export async function getMessage(folder, uid) {
 }
 
 export const markRead = (folder, uids, read = true) =>
-  rpc(METHODS.flag, { guid: folder, uids, flag: '\\Seen', set: read });
+  rpc(METHODS.flag, { guid: fid(folder), uids, flag: '\\Seen', set: read });
 export const star = (folder, uids, on = true) =>
-  rpc(METHODS.flag, { guid: folder, uids, flag: '\\Flagged', set: on });
+  rpc(METHODS.flag, { guid: fid(folder), uids, flag: '\\Flagged', set: on });
 export const moveTo = (folder, uids, dest) =>
-  rpc(METHODS.move, { guid: folder, uids, destGuid: dest });
+  rpc(METHODS.move, { guid: fid(folder), uids, destGuid: fid(dest) });
 export const archive = (folder, uids) => moveTo(folder, uids, FOLDERS.archive);
 export const trash = (folder, uids) => moveTo(folder, uids, FOLDERS.trash);
-export const remove = (folder, uids) => rpc(METHODS.remove, { guid: folder, uids });
+export const remove = (folder, uids) => rpc(METHODS.remove, { folder: fid(folder), uids, rollbackslot: null });
 
 export function sendMessage({ to, cc = [], subject, body, inReplyTo = '', attachments = [] }) {
   return rpc(METHODS.send, { to, cc, subject, textBody: body, inReplyTo, attachments });
