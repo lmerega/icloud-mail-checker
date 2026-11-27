@@ -136,5 +136,8 @@
   },
   "signedOut": {
     "message": "Not signed in"
+  },
+  "wrote": {
+    "message": "wrote"
   }
 }

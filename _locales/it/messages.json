@@ -136,5 +136,8 @@
   },
   "signedOut": {
     "message": "Non connesso"
+  },
+  "wrote": {
+    "message": "ha scritto"
   }
 }

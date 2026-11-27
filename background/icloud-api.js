@@ -1,3 +1,4 @@
+import { htmlToText } from '../lib/text.js';
 import { SETUP_URL, WEB_ORIGIN, CLIENT, FOLDERS } from './constants.js';
 
 let session = null; // { dsid, mailUrl, email, name, at }
@@ -113,13 +114,6 @@ export async function unreadCount(folder = FOLDERS.inbox) {
 // Verified 2026-11-27 (response shapes, read-only): thread/get -> messageMetadataList[{uid, parts[...]}],
 // message/get {uid, parts:[partId], dontMarkAsRead} -> parts[{content}] (already decoded).
 // UNTESTED against a real mailbox (taken from the web app bundle): thread/flag and thread/move payloads.
-const stripTags = (h) => h
-  .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
-  .replace(/<[^>]+>/g, ' ')
-  .replace(/&nbsp;/g, ' ')
-  .replace(/\s+/g, ' ')
-  .trim();
-
 export async function getMessage(folder, threadId) {
   const sh = SESSION_HEADERS(folder);
   const t = await gatewayPost('/mailws2/v1/thread/get', { threadId, sessionHeaders: sh });
@@ -143,7 +137,7 @@ export async function getMessage(folder, threadId) {
     subject: m.subject || '', date: m.date ? new Date(m.date).toISOString() : null,
     unread: !(m.flags || []).includes('\\Seen'),
     to: m.to || [], cc: m.cc || [], messageId: m.messageId || '',
-    html: html ? content : '', text: html ? stripTags(content) : content,
+    html: html ? content : '', text: html ? htmlToText(content) : content,
     attachments: (m.parts || []).filter((p) => p.isAttach).map((p) => ({ name: p.name || p.partId, size: p.size, type: p.contentType })),
     messages: list.length
   };

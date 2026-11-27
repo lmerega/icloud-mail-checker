@@ -3,13 +3,13 @@
 :root {
   color-scheme: light dark;
   --bg: #f5f5f5; --card: #fff; --text: #333; --mut: #7a7a7a; --accent: #0b57d0;
-  --line: #e2e2e2; --hover: #eaeaea; --icon: #49454f;
+  --line: #e2e2e2; --hover: #eaeaea; --icon: #49454f; --unread: #0b57d0; --read-bg: #ebebeb;
   --glow: 0 0 20px 0 rgba(219, 219, 219, .5); --ring: 0 0 0 1px rgba(193, 193, 193, .6);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #131314; --card: #232323; --text: #ddd; --mut: #9b9b9b; --accent: #e3e3e3;
-    --line: #3a3a3a; --hover: #333; --icon: #ccc; --glow: none; --ring: 0 0 0 1px #4a4a4a;
+    --line: #3a3a3a; --hover: #333; --icon: #ccc; --unread: #8ab4f8; --read-bg: #1b1b1c; --glow: none; --ring: 0 0 0 1px #4a4a4a;
   }
 }
 * { box-sizing: border-box; }
@@ -61,8 +61,14 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .date { color: var(--mut); font-size: 12px; white-space: nowrap; }
 .subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .snippet { color: var(--mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mail.unread .sender, .mail.unread .subject { font-weight: 700; }
-.mail:not(.unread) .sender { font-weight: 400; }
+/* Unread: bright card, accent bar, bold text. Read: dimmed, flat, regular weight. */
+.mail.unread { background: var(--card); box-shadow: var(--glow), inset 5px 0 0 var(--unread); }
+.mail.unread .sender, .mail.unread .subject { font-weight: 700; color: var(--text); }
+.mail.unread .date { color: var(--text); font-weight: 600; }
+.mail:not(.unread) { background: var(--read-bg); box-shadow: none; }
+.mail:not(.unread) .sender, .mail:not(.unread) .subject { font-weight: 400; color: var(--mut); }
+.mail:not(.unread) .avatar { opacity: .6; }
+.mail:hover { box-shadow: var(--ring); }
 .mail .actions { position: absolute; right: 14px; top: 8px; display: none; background: var(--card); border-radius: 22px; }
 .mail:hover .actions { display: flex; }
 .mail:hover .date { visibility: hidden; }

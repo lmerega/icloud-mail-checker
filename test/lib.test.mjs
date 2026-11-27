@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { findVerificationCode } from '../lib/codes.js';
 import { parseSender, normalizeThread } from '../background/icloud-api.js';
+import { htmlToText, quoteForReply } from '../lib/text.js';
 import { parseInvitation, buildReply } from '../lib/ics.js';
 
 test('detects verification codes', () => {
@@ -34,4 +35,10 @@ test('parses thread digests', () => {
   assert.deepEqual(parseSender('"Acme & Co." <a@x.invalid>'), { name: 'Acme & Co.', address: 'a@x.invalid' });
   const m = normalizeThread({ threadId: 't1', senders: ['B <b@x.invalid>'], flags: ['\\Seen'], timestamp: 0 }, 'INBOX');
   assert.equal(m.unread, false);
+});
+
+test('html to text decodes entities and keeps lines', () => {
+  const s = htmlToText('<p>Hello&nbsp;&#160;world &amp; co</p><p>Line&#8212;two</p>');
+  assert.equal(s, 'Hello world & co\nLine—two');
+  assert.equal(quoteForReply('a\n\nb'), '> a\n>\n> b');
 });

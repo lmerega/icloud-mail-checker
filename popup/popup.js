@@ -1,4 +1,5 @@
 import { icon, paintIcons } from './icons.js';
+import { quoteForReply } from '../lib/text.js';
 
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
@@ -174,7 +175,8 @@ $('act-trash').onclick = act('trash');
 function compose(reply) {
   $('c-to').value = reply ? reply.fromAddress : '';
   $('c-subject').value = reply ? (/^re:/i.test(reply.subject) ? reply.subject : `Re: ${reply.subject}`) : '';
-  $('c-body').value = reply && reply.text ? `\n\n> ${reply.text.split('\n').join('\n> ')}` : '';
+  const who = reply ? `${reply.date ? new Date(reply.date).toLocaleString() : ''}, ${reply.from} ${t('wrote')}:` : '';
+  $('c-body').value = reply && reply.text ? `\n\n${who}\n${quoteForReply(reply.text)}` : '';
   $('c-status').textContent = '';
   show('v-composer');
   (reply ? $('c-body') : $('c-to')).focus();
