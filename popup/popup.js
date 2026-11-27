@@ -186,6 +186,19 @@ async function open(m) {
   } catch (e) {
     $('d-err').textContent = String(e.message || e);
   }
+  // Opening a message in the popup counts as reading it.
+  if (m.unread) {
+    const opened = current;
+    call({ action: 'read', folder: m.folder, uids: [m.uid], read: true }).then((rr) => {
+      if (rr.ok) {
+        m.unread = false;
+        opened.unread = false;
+        if (current === opened) paintFlags();
+      } else if (current === opened) {
+        $('d-err').textContent = rr.error;
+      }
+    });
+  }
   if (full.code) {
     const box = $('d-code');
     box.hidden = false;
