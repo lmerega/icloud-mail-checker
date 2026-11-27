@@ -4,5 +4,8 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "scripts": { "test": "node --test test/*.test.mjs" }
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "pack": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && git archive --format=zip -o dist/icloud-mail-checker.zip HEAD"
+  }
 }
