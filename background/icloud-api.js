@@ -56,6 +56,8 @@ export async function getSession(force = false) {
 
 export function clearSession() { session = null; }
 
+export const rawRpc = (path, method, params) => rpc({ path, method }, params);
+
 async function rpc(def, params = {}) {
   const s = await getSession();
   const url = `${s.mailUrl}${def.path}?${qs({ dsid: s.dsid, method: def.method })}`;

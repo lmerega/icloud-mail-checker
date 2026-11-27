@@ -19,7 +19,20 @@ chrome.storage.onChanged.addListener((c, area) => {
   if (area === 'sync' && c.settings) scheduleAlarm();
 });
 
+const shape = (x, d = 0) => x === null ? 'null' : Array.isArray(x) ? ['arr' + x.length, x.length && d < 3 ? shape(x[0], d + 1) : 0] : typeof x === 'object' ? Object.fromEntries(Object.entries(x).slice(0, 30).map(([k, y]) => [k, d < 3 ? shape(y, d + 1) : typeof y])) : typeof x;
+
 const actions = {
+  // Diagnostics: reports only the SHAPE of responses (keys/types), never mail content.
+  async diag() {
+    const out = {};
+    try { const s = await api.getSession(true); out.session = { mail: s.mailUrl.replace(/p\d+/, 'pNN'), hasDsid: !!s.dsid }; }
+    catch (e) { return { session: 'FAIL ' + e.message }; }
+    for (const [name, fn] of [['folders', () => api.rawRpc('/wm/folder', 'list', {})],
+      ['messages', () => api.rawRpc('/wm/message', 'list', { guid: 'folder:INBOX', sorttype: 'Date', sortorder: 'descending', startindex: 1, count: 1 })]]) {
+      try { out[name] = shape(await fn()); } catch (e) { out[name] = 'FAIL ' + e.message; }
+    }
+    return out;
+  },
   poll: () => poll(),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
   openWeb: () => chrome.tabs.create({ url: MAIL_URL }),

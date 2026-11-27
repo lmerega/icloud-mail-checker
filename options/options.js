@@ -45,4 +45,10 @@ $('file').onchange = async (e) => {
   } catch { $('msg').textContent = t('importError'); }
 };
 
+$('diag').onclick = async () => {
+  $('diagOut').textContent = '…';
+  const r = await chrome.runtime.sendMessage({ action: 'diag' });
+  $('diagOut').textContent = JSON.stringify(r.ok ? r.result : r.error, null, 2);
+};
+
 load();
