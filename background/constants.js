@@ -1,0 +1,31 @@
+// Central place for every iCloud web endpoint detail.
+// UNVERIFIED: iCloud Mail has no public API. These values mirror what the
+// icloud.com web app is believed to use and may change without notice.
+// If something breaks, fix it here and in icloud-api.js only.
+export const SETUP_URL = 'https://setup.icloud.com/setup/ws/1/validate';
+export const WEB_ORIGIN = 'https://www.icloud.com';
+export const CLIENT = {
+  clientBuildNumber: '2420Project37',
+  clientMasteringNumber: '2420B20'
+};
+export const FOLDERS = {
+  inbox: 'INBOX',
+  archive: 'Archive',
+  trash: 'Deleted Messages',
+  sent: 'Sent Messages'
+};
+// JSON-RPC style method names used by the mail web service.
+export const METHODS = {
+  listFolders: { path: '/wm/folder', method: 'list' },
+  listMessages: { path: '/wm/message', method: 'list' },
+  getMessage: { path: '/wm/message', method: 'get' },
+  move: { path: '/wm/message', method: 'move' },
+  remove: { path: '/wm/message', method: 'delete' },
+  flag: { path: '/wm/message', method: 'flag' },
+  send: { path: '/wm/message', method: 'send' }
+};
+export const DEFAULTS = {
+  pollMinutes: 2,
+  notifications: true,
+  badge: true
+};

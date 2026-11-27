@@ -1,0 +1,101 @@
+{
+  "appName": {
+    "message": "LibreMail for iCloud"
+  },
+  "appShortName": {
+    "message": "LibreMail iCloud"
+  },
+  "appDescription": {
+    "message": "Unofficial, free and open-source iCloud Mail companion: inbox checks, notifications and everyday mail actions."
+  },
+  "inbox": {
+    "message": "Inbox"
+  },
+  "archive": {
+    "message": "Archive"
+  },
+  "sent": {
+    "message": "Sent"
+  },
+  "trash": {
+    "message": "Trash"
+  },
+  "compose": {
+    "message": "Compose"
+  },
+  "refresh": {
+    "message": "Refresh"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "signIn": {
+    "message": "Sign in to iCloud"
+  },
+  "signInHint": {
+    "message": "Sign in at icloud.com in this browser, then reopen this popup."
+  },
+  "empty": {
+    "message": "No messages"
+  },
+  "reply": {
+    "message": "Reply"
+  },
+  "markRead": {
+    "message": "Mark read"
+  },
+  "markUnread": {
+    "message": "Mark unread"
+  },
+  "to": {
+    "message": "To"
+  },
+  "subject": {
+    "message": "Subject"
+  },
+  "send": {
+    "message": "Send"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "codeLabel": {
+    "message": "Verification code"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "newMail": {
+    "message": "New mail"
+  },
+  "accept": {
+    "message": "Accept"
+  },
+  "tentative": {
+    "message": "Maybe"
+  },
+  "decline": {
+    "message": "Decline"
+  },
+  "pollEvery": {
+    "message": "Check every"
+  },
+  "notifications": {
+    "message": "Desktop notifications"
+  },
+  "badge": {
+    "message": "Unread badge"
+  },
+  "export": {
+    "message": "Export settings"
+  },
+  "import": {
+    "message": "Import settings"
+  },
+  "saved": {
+    "message": "Saved"
+  },
+  "importError": {
+    "message": "Invalid file"
+  }
+}

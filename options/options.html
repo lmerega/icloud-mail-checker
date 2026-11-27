@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Options</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font: 14px system-ui, sans-serif; background:#16181d; color:#e6e8ec; max-width:520px; margin:24px auto; padding:0 16px; }
+    label { display:block; margin:12px 0; } input[type=number] { width:70px; }
+    button { margin-right:8px; padding:6px 12px; }
+  </style>
+</head>
+<body>
+  <h1 id="h"></h1>
+  <label><span data-i18n="pollEvery"></span> <input id="poll" type="number" min="1" max="60"> min</label>
+  <label><input id="notif" type="checkbox"> <span data-i18n="notifications"></span></label>
+  <label><input id="badge" type="checkbox"> <span data-i18n="badge"></span></label>
+  <p>
+    <button id="export" data-i18n="export"></button>
+    <button id="import" data-i18n="import"></button>
+    <input id="file" type="file" accept="application/json" hidden>
+  </p>
+  <p id="msg"></p>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

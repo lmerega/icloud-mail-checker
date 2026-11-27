@@ -1,0 +1,101 @@
+{
+  "appName": {
+    "message": "LibreMail per iCloud"
+  },
+  "appShortName": {
+    "message": "LibreMail iCloud"
+  },
+  "appDescription": {
+    "message": "Companion non ufficiale, gratuito e open source per iCloud Mail: controllo posta, notifiche e azioni rapide."
+  },
+  "inbox": {
+    "message": "Posta"
+  },
+  "archive": {
+    "message": "Archivio"
+  },
+  "sent": {
+    "message": "Inviata"
+  },
+  "trash": {
+    "message": "Cestino"
+  },
+  "compose": {
+    "message": "Scrivi"
+  },
+  "refresh": {
+    "message": "Aggiorna"
+  },
+  "settings": {
+    "message": "Impostazioni"
+  },
+  "signIn": {
+    "message": "Accedi a iCloud"
+  },
+  "signInHint": {
+    "message": "Accedi a icloud.com in questo browser, poi riapri questo popup."
+  },
+  "empty": {
+    "message": "Nessun messaggio"
+  },
+  "reply": {
+    "message": "Rispondi"
+  },
+  "markRead": {
+    "message": "Segna letto"
+  },
+  "markUnread": {
+    "message": "Segna non letto"
+  },
+  "to": {
+    "message": "A"
+  },
+  "subject": {
+    "message": "Oggetto"
+  },
+  "send": {
+    "message": "Invia"
+  },
+  "cancel": {
+    "message": "Annulla"
+  },
+  "codeLabel": {
+    "message": "Codice di verifica"
+  },
+  "copy": {
+    "message": "Copia"
+  },
+  "newMail": {
+    "message": "Nuova mail"
+  },
+  "accept": {
+    "message": "Accetta"
+  },
+  "tentative": {
+    "message": "Forse"
+  },
+  "decline": {
+    "message": "Rifiuta"
+  },
+  "pollEvery": {
+    "message": "Controlla ogni"
+  },
+  "notifications": {
+    "message": "Notifiche desktop"
+  },
+  "badge": {
+    "message": "Badge non letti"
+  },
+  "export": {
+    "message": "Esporta impostazioni"
+  },
+  "import": {
+    "message": "Importa impostazioni"
+  },
+  "saved": {
+    "message": "Salvato"
+  },
+  "importError": {
+    "message": "File non valido"
+  }
+}

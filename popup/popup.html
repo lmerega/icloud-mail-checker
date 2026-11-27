@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <strong id="title"></strong>
+    <span id="who"></span>
+    <span class="spacer"></span>
+    <button id="compose" data-i18n-title="compose">✎</button>
+    <button id="refresh" data-i18n-title="refresh">⟳</button>
+    <button id="settings" data-i18n-title="settings">⚙</button>
+  </header>
+  <nav id="tabs">
+    <button data-folder="INBOX" class="on" data-i18n="inbox"></button>
+    <button data-folder="Archive" data-i18n="archive"></button>
+    <button data-folder="Sent Messages" data-i18n="sent"></button>
+    <button data-folder="Deleted Messages" data-i18n="trash"></button>
+  </nav>
+  <main id="signin" hidden>
+    <p data-i18n="signInHint"></p>
+    <button id="signinBtn" data-i18n="signIn"></button>
+  </main>
+  <main id="list"></main>
+  <section id="detail" hidden>
+    <div class="bar">
+      <button id="back">←</button>
+      <button id="act-read"></button>
+      <button id="act-star">★</button>
+      <button id="act-archive" data-i18n="archive"></button>
+      <button id="act-trash" data-i18n="trash"></button>
+      <button id="act-reply" data-i18n="reply"></button>
+    </div>
+    <h2 id="d-subject"></h2>
+    <div id="d-meta"></div>
+    <div id="d-code" hidden></div>
+    <div id="d-invite" hidden></div>
+    <iframe id="d-body" sandbox="" referrerpolicy="no-referrer"></iframe>
+    <ul id="d-att"></ul>
+  </section>
+  <section id="composer" hidden>
+    <input id="c-to" data-i18n-ph="to">
+    <input id="c-subject" data-i18n-ph="subject">
+    <textarea id="c-body"></textarea>
+    <div class="bar">
+      <button id="c-send" data-i18n="send"></button>
+      <button id="c-cancel" data-i18n="cancel"></button>
+    </div>
+    <div id="c-status"></div>
+  </section>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
