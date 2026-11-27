@@ -39,6 +39,7 @@ const actions = {
     } catch (e) { out.folders = { ok: false, detail: String(e.message || e) }; }
     return out;
   },
+  emptyTrash: () => api.emptyFolder('Deleted Messages'),
   poll: () => poll(true),
   signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
   openWeb: () => chrome.tabs.create({ url: MAIL_URL }),

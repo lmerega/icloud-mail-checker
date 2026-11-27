@@ -47,6 +47,15 @@
         <button data-folder="Sent Messages" data-i18n="sent"></button>
         <button data-folder="Deleted Messages" data-i18n="trash"></button>
       </nav>
+      <div id="trashbar" class="trashbar" hidden>
+        <button id="empty-trash" class="danger" data-i18n="emptyTrash"></button>
+        <div id="trash-confirm" class="confirm" hidden>
+          <span data-i18n="emptyConfirm"></span>
+          <button id="trash-cancel" class="btn" data-i18n="cancel"></button>
+          <button id="trash-go" class="danger solid" data-i18n="deleteForever"></button>
+        </div>
+        <div id="trash-status" class="addr"></div>
+      </div>
       <div id="list"></div>
     </div>
   </main>

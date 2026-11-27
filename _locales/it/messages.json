@@ -235,5 +235,20 @@
   },
   "nextMail": {
     "message": "Messaggio successivo"
+  },
+  "emptyTrash": {
+    "message": "Svuota il cestino"
+  },
+  "emptyConfirm": {
+    "message": "Eliminare definitivamente tutti i messaggi nel cestino? L'operazione non si può annullare."
+  },
+  "deleteForever": {
+    "message": "Elimina per sempre"
+  },
+  "trashEmptied": {
+    "message": "Cestino svuotato"
+  },
+  "trashLeft": {
+    "message": "Nel cestino restano {n} conversazioni"
   }
 }

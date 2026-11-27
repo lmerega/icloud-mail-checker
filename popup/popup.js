@@ -134,6 +134,8 @@ async function load() {
     return;
   }
   listItems = r.result;
+  $('trashbar').hidden = !(folder === 'Deleted Messages' && !query && r.result.length);
+  $('trash-confirm').hidden = true;
   list.replaceChildren(...r.result.map(row));
 }
 
@@ -338,6 +340,20 @@ $('signinBtn').onclick = () => call({ action: 'signIn' });
 $('open-web').onclick = () => call({ action: 'openWeb' });
 $('acc-compose').onclick = () => compose(null);
 $('act-reply').onclick = () => compose(current);
+$('empty-trash').onclick = () => { $('trash-confirm').hidden = false; $('empty-trash').hidden = true; $('trash-status').textContent = ''; };
+$('trash-cancel').onclick = () => { $('trash-confirm').hidden = true; $('empty-trash').hidden = false; };
+$('trash-go').onclick = async () => {
+  $('trash-go').disabled = true;
+  $('trash-confirm').hidden = true;
+  $('trash-status').textContent = '…';
+  const r = await call({ action: 'emptyTrash' });
+  $('trash-go').disabled = false;
+  $('empty-trash').hidden = false;
+  if (!r.ok) { $('trash-status').textContent = r.error; return; }
+  const left = r.result.left;
+  $('trash-status').textContent = left === 0 ? t('trashEmptied') : `${t('trashLeft').replace('{n}', left)}`;
+  load();
+};
 $('d-back').onclick = home;
 $('d-prev').onclick = () => step(-1);
 $('d-next').onclick = () => step(1);

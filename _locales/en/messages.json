@@ -235,5 +235,20 @@
   },
   "nextMail": {
     "message": "Next message"
+  },
+  "emptyTrash": {
+    "message": "Empty trash"
+  },
+  "emptyConfirm": {
+    "message": "Permanently delete all messages in the trash? This cannot be undone."
+  },
+  "deleteForever": {
+    "message": "Delete forever"
+  },
+  "trashEmptied": {
+    "message": "Trash emptied"
+  },
+  "trashLeft": {
+    "message": "{n} conversations are still in the trash"
   }
 }

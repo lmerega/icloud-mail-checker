@@ -108,6 +108,7 @@ const SCENES = {
   open: { h: 640, act: "document.querySelectorAll('.mail')[1].click();" },
   thread: { h: 740, act: "document.querySelectorAll('.mail')[0].click();" },
   reply: { h: 700, act: "document.querySelectorAll('.mail')[0].click(); setTimeout(()=>{ document.getElementById('act-reply').click(); setTimeout(() => { document.getElementById('c-editor').innerHTML = '<div>Sounds perfect, see you there!</div>'; }, 300); }, 500);" },
+  trash: { h: 620, act: "document.querySelectorAll('#tabs button')[3].click(); setTimeout(() => document.getElementById('empty-trash').click(), 500);" },
   dark: { h: 620, act: '', dark: true }
 };
 

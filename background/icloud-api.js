@@ -189,3 +189,41 @@ export async function sendMessage({ to, subject, body, html = '' }) {
   });
   return { id: r.sentMessageGUID ?? null };
 }
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function folderThreadIds(folder, max = 1000) {
+  const r = await gatewayPost('/mailws2/v1/thread/search', {
+    responseType: 'THREAD_ID_AND_DATE', includeFolderStatus: true, maxResults: max, sessionHeaders: SESSION_HEADERS(folder)
+  });
+  return { ids: (r.threadList || []).map((t) => t.threadId), total: r.folderStatus?.undeletedThreads ?? (r.threadList || []).length };
+}
+
+/**
+ * Permanently deletes everything in a folder (used for the Trash). UNTESTED on a real mailbox:
+ * first tries the web app's bulk job (POST /bulkaction/v1/action/emptymailbox), and if iCloud
+ * rejects the request, falls back to deleting threads in chunks. Always re-counts afterwards and
+ * returns how many threads are left, so the caller can report honestly.
+ */
+export async function emptyFolder(folder = FOLDERS.trash) {
+  let used = 'bulk';
+  try {
+    await gatewayPost('/bulkaction/v1/action/emptymailbox', { sourceMailbox: folder });
+  } catch (e) {
+    if (e instanceof AuthError) throw e;
+    used = 'threads';
+    const { ids } = await folderThreadIds(folder);
+    for (let i = 0; i < ids.length; i += 100) {
+      await gatewayPost('/mailws2/v1/thread/move', {
+        moveMethod: 'DELETE', destFolder: folder, threadIds: ids.slice(i, i + 100), sessionHeaders: SESSION_HEADERS(folder)
+      });
+    }
+  }
+  let left = -1;
+  for (let n = 0; n < 4; n++) {
+    await sleep(1200);
+    left = (await folderThreadIds(folder, 1)).total;
+    if (left === 0) break;
+  }
+  return { left, used };
+}
