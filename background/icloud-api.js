@@ -114,32 +114,45 @@ export async function unreadCount(folder = FOLDERS.inbox) {
 // Verified 2026-11-27 (response shapes, read-only): thread/get -> messageMetadataList[{uid, parts[...]}],
 // message/get {uid, parts:[partId], dontMarkAsRead} -> parts[{content}] (already decoded).
 // UNTESTED against a real mailbox (taken from the web app bundle): thread/flag and thread/move payloads.
-export async function getMessage(folder, threadId) {
-  const sh = SESSION_HEADERS(folder);
-  const t = await gatewayPost('/mailws2/v1/thread/get', { threadId, sessionHeaders: sh });
-  const list = t.messageMetadataList || [];
-  const m = list[list.length - 1];
-  if (!m) throw new Error('empty thread');
+async function loadBody(folder, m) {
   const bodyParts = (m.parts || []).filter((p) => !p.isAttach && /^text\/(html|plain)$/i.test(p.contentType));
-  const html = bodyParts.find((p) => /html/i.test(p.contentType)) || null;
-  const chosen = html || bodyParts[0];
+  const htmlPart = bodyParts.find((p) => /html/i.test(p.contentType)) || null;
+  const chosen = htmlPart || bodyParts[0];
   let content = '';
   if (chosen) {
-    const r = await gatewayPost('/mailws2/v1/message/get', {
-      uid: m.uid, parts: [chosen.partId], dontMarkAsRead: true, sessionHeaders: sh
-    });
-    content = r.parts?.[0]?.content || '';
+    try {
+      const r = await gatewayPost('/mailws2/v1/message/get', {
+        uid: m.uid, parts: [chosen.partId], dontMarkAsRead: true, sessionHeaders: SESSION_HEADERS(folder)
+      });
+      content = r.parts?.[0]?.content || '';
+    } catch (e) {
+      if (e instanceof AuthError) throw e;
+    }
   }
   const snd = parseSender((m.from || [])[0]);
   return {
-    uid: String(threadId), threadId: String(threadId), folder,
+    uid: String(m.uid),
     from: snd.name || snd.address, fromAddress: snd.address,
     subject: m.subject || '', date: m.date ? new Date(m.date).toISOString() : null,
     unread: !(m.flags || []).includes('\\Seen'),
     to: m.to || [], cc: m.cc || [], messageId: m.messageId || '',
-    html: html ? content : '', text: html ? htmlToText(content) : content,
-    attachments: (m.parts || []).filter((p) => p.isAttach).map((p) => ({ name: p.name || p.partId, size: p.size, type: p.contentType })),
-    messages: list.length
+    html: htmlPart ? content : '', text: htmlPart ? htmlToText(content) : content,
+    attachments: (m.parts || []).filter((p) => p.isAttach).map((p) => ({ name: p.name || p.partId, size: p.size, type: p.contentType }))
+  };
+}
+
+const MAX_THREAD_MESSAGES = 12;
+
+/** Whole conversation: `thread` holds every message (oldest first); top-level fields mirror the latest. */
+export async function getMessage(folder, threadId) {
+  const t = await gatewayPost('/mailws2/v1/thread/get', { threadId, sessionHeaders: SESSION_HEADERS(folder) });
+  const list = (t.messageMetadataList || []).slice(-MAX_THREAD_MESSAGES);
+  if (!list.length) throw new Error('empty thread');
+  const thread = await Promise.all(list.map((m) => loadBody(folder, m)));
+  const last = thread[thread.length - 1];
+  return {
+    ...last, uid: String(threadId), threadId: String(threadId), folder, thread,
+    messages: (t.messageMetadataList || []).length
   };
 }
 
@@ -157,13 +170,13 @@ export const trash = (folder, threadIds) => gatewayPost('/mailws2/v1/thread/move
 });
 
 // Body shape taken from the web app bundle (UNTESTED): POST /mailws2/v1/message/send.
-export async function sendMessage({ to, subject, body }) {
+export async function sendMessage({ to, subject, body, html = '' }) {
   const s = await getSession();
   const from = s.email;
   if (!from) throw new Error('sender address unknown');
   const r = await gatewayPost('/mailws2/v1/message/send', {
     date: new Date().toUTCString().replace('GMT', '-0000'),
-    from, to, subject, textBody: body, htmlBody: '', isHME: false, webmailClientBuild: 'current'
+    from, to, subject, textBody: body, htmlBody: html, isHME: false, webmailClientBuild: 'current'
   });
   return { id: r.sentMessageGUID ?? null };
 }

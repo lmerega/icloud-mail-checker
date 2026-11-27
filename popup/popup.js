@@ -1,5 +1,6 @@
 import { icon, paintIcons } from './icons.js';
 import { quoteForReply } from '../lib/text.js';
+import { renderMail, buildReplyHtml } from '../lib/sanitize.js';
 
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
@@ -115,16 +116,49 @@ async function load() {
 }
 
 /* ---------- message ---------- */
-const CSP = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">";
-// The reading pane is always light: emails that ship dark-mode rules (white text) would
-// otherwise turn invisible on the white pane, so those rules are disabled.
-const BASE = '<meta name="color-scheme" content="light"><base target="_blank"><style>html{color-scheme:light;background:#fff;color:#202124}body{font:14px Roboto,Arial,sans-serif;margin:12px;word-wrap:break-word}</style>';
-const lightOnly = (html) => html.replace(/prefers-color-scheme\s*:\s*dark/gi, 'prefers-color-scheme: x-disabled');
-
+// Mail is rendered in a shadow root after sanitizing (no iframe): see lib/sanitize.js.
 function paintFlags() {
   $('act-read').replaceChildren(icon(current.unread ? 'read' : 'mail', 22));
   $('act-read').title = current.unread ? t('markRead') : t('markUnread');
   $('act-star').replaceChildren(icon(current.starred ? 'star' : 'starBorder', 22));
+}
+
+function previewCard(m) {
+  const card = document.createElement('div');
+  card.className = 'msg single';
+  const body = document.createElement('div');
+  body.className = 'mbody';
+  renderMail(body, '', m.preview);
+  card.append(body);
+  return card;
+}
+
+function threadCards(thread) {
+  const multi = thread.length > 1;
+  return thread.map((x, i) => {
+    const card = document.createElement('div');
+    card.className = 'msg' + (multi ? '' : ' single');
+    const body = document.createElement('div');
+    body.className = 'mbody';
+    let painted = false;
+    const paint = () => { if (!painted) { renderMail(body, x.html, x.text); painted = true; } };
+    if (multi) {
+      const head = document.createElement('div');
+      head.className = 'msg-head';
+      const who = document.createElement('span'); who.className = 'who'; who.textContent = x.from;
+      const snip = document.createElement('span'); snip.className = 'snip';
+      const when = document.createElement('span'); when.className = 'when'; when.textContent = x.date ? new Date(x.date).toLocaleString() : '';
+      head.append(avatar(x.from), who, snip, when);
+      const setOpen = (on) => { body.hidden = !on; snip.textContent = on ? '' : (x.text || '').replace(/\s+/g, ' ').slice(0, 140); if (on) paint(); };
+      head.onclick = () => setOpen(body.hidden);
+      card.append(head, body);
+      setOpen(i === thread.length - 1);
+    } else {
+      card.append(body);
+      paint();
+    }
+    return card;
+  });
 }
 
 async function open(m) {
@@ -133,7 +167,7 @@ async function open(m) {
   $('d-sender').textContent = m.from;
   $('d-addr').textContent = m.fromAddress ? `<${m.fromAddress}>` : '';
   $('d-date').textContent = m.date ? new Date(m.date).toLocaleString() : '';
-  $('d-body').srcdoc = `${CSP}${BASE}<pre style="white-space:pre-wrap">${esc(m.preview)}</pre>`;
+  $('d-thread').replaceChildren(previewCard(m));
   $('d-code').hidden = true;
   $('d-err').textContent = '';
   $('d-att').replaceChildren();
@@ -144,9 +178,11 @@ async function open(m) {
   if (!r.ok) { $('d-err').textContent = r.error; return; }
   const full = r.result;
   current = { ...m, ...full, preview: m.preview, starred: m.starred };
-  $('d-body').srcdoc = full.html
-    ? `${CSP}${BASE}${lightOnly(full.html)}`
-    : `${CSP}${BASE}<pre style="white-space:pre-wrap">${esc(full.text)}</pre>`;
+  try {
+    $('d-thread').replaceChildren(...threadCards(full.thread));
+  } catch (e) {
+    $('d-err').textContent = String(e.message || e);
+  }
   if (full.code) {
     const box = $('d-code');
     box.hidden = false;
@@ -172,11 +208,24 @@ $('act-archive').onclick = act('archive');
 $('act-trash').onclick = act('trash');
 
 /* ---------- composer ---------- */
+let replyCtx = null; // { html, who } when answering an HTML message
+
 function compose(reply) {
+  replyCtx = null;
   $('c-to').value = reply ? reply.fromAddress : '';
   $('c-subject').value = reply ? (/^re:/i.test(reply.subject) ? reply.subject : `Re: ${reply.subject}`) : '';
   const who = reply ? `${reply.date ? new Date(reply.date).toLocaleString() : ''}, ${reply.from} ${t('wrote')}:` : '';
-  $('c-body').value = reply && reply.text ? `\n\n${who}\n${quoteForReply(reply.text)}` : '';
+  const quote = $('c-quote');
+  quote.hidden = true;
+  if (reply && reply.html) {
+    // HTML original: keep it as an HTML quote (shown below, sent as rich content).
+    replyCtx = { html: reply.html, who, text: reply.text };
+    $('c-body').value = '';
+    renderMail(quote, reply.html);
+    quote.hidden = false;
+  } else {
+    $('c-body').value = reply && reply.text ? `\n\n${who}\n${quoteForReply(reply.text)}` : '';
+  }
   $('c-status').textContent = '';
   show('v-composer');
   (reply ? $('c-body') : $('c-to')).focus();
@@ -186,7 +235,13 @@ $('c-send').onclick = async () => {
   const to = $('c-to').value.split(/[,;\s]+/).filter(Boolean);
   if (!to.length) { $('c-status').textContent = t('to'); return; }
   $('c-send').disabled = true;
-  const r = await call({ action: 'send', to, subject: $('c-subject').value, body: $('c-body').value });
+  const typed = $('c-body').value;
+  const msg = { action: 'send', to, subject: $('c-subject').value, body: typed };
+  if (replyCtx) {
+    msg.body = `${typed}\n\n${replyCtx.who}\n${quoteForReply(replyCtx.text)}`;
+    msg.html = buildReplyHtml(typed, replyCtx.who, replyCtx.html);
+  }
+  const r = await call(msg);
   $('c-send').disabled = false;
   if (r.ok) { $('c-status').textContent = t('sentOk'); setTimeout(home, 800); }
   else $('c-status').textContent = r.error;
