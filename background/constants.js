@@ -19,5 +19,6 @@ export const FOLDERS = {
 export const DEFAULTS = {
   pollMinutes: 1,
   notifications: true,
-  badge: true
+  badge: true,
+  theme: 'auto'
 };

@@ -5,11 +5,21 @@
   --bg: #f5f5f5; --card: #fff; --text: #333; --mut: #7a7a7a; --accent: #0b57d0;
   --line: #e2e2e2; --hover: #eaeaea; --icon: #49454f; --unread: #0b57d0; --read-bg: #ebebeb;
   --glow: 0 0 20px 0 rgba(219, 219, 219, .5); --ring: 0 0 0 1px rgba(193, 193, 193, .6);
+  --on-accent: #fff; --tab-on: rgba(11, 87, 208, .1); --hero-a: #7c3aed; --hero-b: #2563eb;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] {
+    color-scheme: dark;
     --bg: #131314; --card: #232323; --text: #ddd; --mut: #9b9b9b; --accent: #e3e3e3;
     --line: #3a3a3a; --hover: #333; --icon: #ccc; --unread: #8ab4f8; --read-bg: #1b1b1c; --glow: none; --ring: 0 0 0 1px #4a4a4a;
+    --on-accent: #1b1b1b; --tab-on: rgba(255, 255, 255, .12); --hero-a: #c4b5fd; --hero-b: #93c5fd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #131314; --card: #232323; --text: #ddd; --mut: #9b9b9b; --accent: #e3e3e3;
+    --line: #3a3a3a; --hover: #333; --icon: #ccc; --unread: #8ab4f8; --read-bg: #1b1b1c; --glow: none; --ring: 0 0 0 1px #4a4a4a;
+    --on-accent: #1b1b1b; --tab-on: rgba(255, 255, 255, .12); --hero-a: #c4b5fd; --hero-b: #93c5fd;
   }
 }
 * { box-sizing: border-box; }
@@ -23,8 +33,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .icon { width: 40px; height: 40px; border-radius: 50%; display: inline-grid; place-items: center; color: var(--icon); flex-shrink: 0; transition: background .15s; }
 .icon:hover { background: var(--hover); }
 .icon.sm { width: 32px; height: 32px; }
-.primary { background: var(--accent); color: #fff; border-radius: 20px; padding: 8px 22px; font-weight: 500; }
-@media (prefers-color-scheme: dark) { .primary { color: #1b1b1b; } }
+.primary { background: var(--accent); color: var(--on-accent); border-radius: 20px; padding: 8px 22px; font-weight: 500; }
 
 .top { display: flex; align-items: center; gap: 2px; padding: 10px 10px 10px 14px; background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; position: sticky; top: 0; z-index: 4; box-shadow: 0 2px 10px rgba(37, 99, 235, .35); }
 .logo-img { width: 30px; height: 30px; border-radius: 8px; margin-right: 10px; box-shadow: 0 1px 4px rgba(0, 0, 0, .3); }
@@ -50,8 +59,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .tabs { display: flex; gap: 4px; padding: 0 18px; }
 .tabs button { padding: 7px 14px; border-radius: 16px; color: var(--mut); }
 .tabs button:hover { background: var(--hover); }
-.tabs .on { color: var(--accent); font-weight: 500; background: rgba(11, 87, 208, .1); }
-@media (prefers-color-scheme: dark) { .tabs .on { background: rgba(255, 255, 255, .12); } }
+.tabs .on { color: var(--accent); font-weight: 500; background: var(--tab-on); }
 
 .mail { position: relative; display: flex; align-items: flex-start; cursor: pointer; padding: 15px; margin: 11px; border-radius: 26px; background: var(--card); box-shadow: var(--glow); transition: box-shadow .15s; }
 .mail:hover { box-shadow: var(--ring); }
@@ -106,8 +114,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* composer, mail-app style */
 .comp-top { display: flex; align-items: center; gap: 2px; padding: 10px 14px; position: sticky; top: 0; z-index: 2; background: var(--bg); }
 .icon.round { background: var(--card); box-shadow: var(--glow); }
-.send-round { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; }
-@media (prefers-color-scheme: dark) { .send-round { color: #1b1b1b; } }
+.send-round { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); }
 .linkrow { display: flex; gap: 8px; padding: 0 18px 8px; }
 .linkrow input { flex: 1; padding: 8px 12px; border-radius: 8px; border: 0; background: var(--card); color: var(--text); font: inherit; }
 .comp-rows { padding: 0 18px; }
@@ -123,6 +130,5 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* big headline */
 .hero { padding: 14px 24px 2px; }
-.hero h1 { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -.5px; background: linear-gradient(135deg, #7c3aed, #2563eb); -webkit-background-clip: text; background-clip: text; color: transparent; }
-@media (prefers-color-scheme: dark) { .hero h1 { background: linear-gradient(135deg, #c4b5fd, #93c5fd); -webkit-background-clip: text; background-clip: text; } }
+.hero h1 { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -.5px; background: linear-gradient(135deg, var(--hero-a), var(--hero-b)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 #hero-sub { color: var(--mut); font-size: 15px; margin-top: 4px; }

@@ -214,5 +214,20 @@
   },
   "connFolders": {
     "message": "Archive, Sent and Trash can be read"
+  },
+  "sectionLook": {
+    "message": "Appearance"
+  },
+  "themeLabel": {
+    "message": "Theme"
+  },
+  "themeAuto": {
+    "message": "Automatic (system)"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeDark": {
+    "message": "Dark"
   }
 }

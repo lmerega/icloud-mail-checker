@@ -63,7 +63,7 @@ window.__LIST = ${JSON.stringify(LIST)};
 window.__THREAD = ${JSON.stringify(THREAD)};
 window.chrome = {
   i18n: { getMessage: (k) => window.__I18N[k] || '' },
-  storage: { local: { get: async () => ({ state: { signedIn: true, email: 'demo@example.invalid', unread: 2 } }) } },
+  storage: { sync: { get: async () => ({}) }, onChanged: { addListener() {} }, local: { get: async () => ({ state: { signedIn: true, email: 'demo@example.invalid', unread: 2 } }) } },
   runtime: {
     getURL: (p) => p, openOptionsPage() {},
     sendMessage: async (m) => {

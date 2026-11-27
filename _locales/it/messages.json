@@ -214,5 +214,20 @@
   },
   "connFolders": {
     "message": "Archivio, Inviata e Cestino si leggono"
+  },
+  "sectionLook": {
+    "message": "Aspetto"
+  },
+  "themeLabel": {
+    "message": "Tema"
+  },
+  "themeAuto": {
+    "message": "Automatico (sistema)"
+  },
+  "themeLight": {
+    "message": "Chiaro"
+  },
+  "themeDark": {
+    "message": "Scuro"
   }
 }

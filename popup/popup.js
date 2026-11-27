@@ -14,6 +14,10 @@ let current = null;
 let query = '';
 let searchTimer = null;
 
+const applyTheme = (th) => { if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; };
+chrome.storage.sync.get('settings').then(({ settings }) => applyTheme(settings?.theme));
+chrome.storage.onChanged.addListener((ch, area) => { if (area === 'sync' && ch.settings) applyTheme(ch.settings.newValue?.theme); });
+
 if (new URLSearchParams(location.search).has('tab')) document.body.classList.add('tab');
 for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
 for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
