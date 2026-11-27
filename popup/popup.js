@@ -11,6 +11,8 @@ const VIEWS = ['v-main', 'v-detail', 'v-composer'];
 const PALETTE = ['#e8710a', '#1a73e8', '#188038', '#a142f4', '#d93025', '#129eaf', '#b06000', '#5f6368', '#c2185b'];
 let folder = 'INBOX';
 let current = null;
+let listItems = []; // messages of the list the user is browsing
+let listPos = -1;
 let query = '';
 let searchTimer = null;
 
@@ -131,6 +133,7 @@ async function load() {
     list.replaceChildren(e);
     return;
   }
+  listItems = r.result;
   list.replaceChildren(...r.result.map(row));
 }
 
@@ -180,8 +183,20 @@ function threadCards(thread) {
   });
 }
 
+function paintNav() {
+  $('d-prev').disabled = listPos <= 0;
+  $('d-next').disabled = listPos < 0 || listPos >= listItems.length - 1;
+}
+
+function step(delta) {
+  const n = listItems[listPos + delta];
+  if (n) open(n);
+}
+
 async function open(m) {
   current = m;
+  listPos = listItems.findIndex((x) => x.uid === m.uid && x.folder === m.folder);
+  paintNav();
   $('d-subject').textContent = m.subject;
   $('d-sender').textContent = m.from;
   $('d-addr').textContent = m.fromAddress ? `<${m.fromAddress}>` : '';
@@ -324,6 +339,14 @@ $('open-web').onclick = () => call({ action: 'openWeb' });
 $('acc-compose').onclick = () => compose(null);
 $('act-reply').onclick = () => compose(current);
 $('d-back').onclick = home;
+$('d-prev').onclick = () => step(-1);
+$('d-next').onclick = () => step(1);
+document.addEventListener('keydown', (e) => {
+  if ($('v-detail').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+  if (e.key === 'ArrowRight' || e.key === 'j') step(1);
+  else if (e.key === 'ArrowLeft' || e.key === 'k') step(-1);
+});
 $('c-back').onclick = home;
 
 $('acc-search').onclick = () => {

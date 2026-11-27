@@ -229,5 +229,11 @@
   },
   "themeDark": {
     "message": "Scuro"
+  },
+  "prevMail": {
+    "message": "Messaggio precedente"
+  },
+  "nextMail": {
+    "message": "Messaggio successivo"
   }
 }

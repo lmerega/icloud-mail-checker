@@ -11,6 +11,8 @@ test('detects verification codes', () => {
   assert.equal(findVerificationCode('Il tuo codice: 123 456'), '123456');
   assert.equal(findVerificationCode('Security code 2024 expires'), null);
   assert.equal(findVerificationCode('Order 12345 shipped'), null);
+  assert.equal(findVerificationCode('Verifica le offerte. Spedizione a 20154 Milano'), null);
+  assert.equal(findVerificationCode('Your code: 20154'), '20154');
 });
 
 test('parses and answers invitations', () => {

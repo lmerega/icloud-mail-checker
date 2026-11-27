@@ -229,5 +229,11 @@
   },
   "themeDark": {
     "message": "Dark"
+  },
+  "prevMail": {
+    "message": "Previous message"
+  },
+  "nextMail": {
+    "message": "Next message"
   }
 }

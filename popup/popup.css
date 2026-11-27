@@ -136,3 +136,5 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .mail-star { position: absolute; right: 12px; bottom: 12px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--mut); }
 .mail-star:hover { background: var(--hover); color: var(--text); }
 .mail-star.on { color: #f4b400; }
+
+.icon:disabled { opacity: .3; cursor: default; background: none; }
