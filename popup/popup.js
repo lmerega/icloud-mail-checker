@@ -1,10 +1,10 @@
+import { findVerificationCode } from '../lib/codes.js';
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
 const call = (m) => chrome.runtime.sendMessage(m);
 
 let folder = 'INBOX';
 let current = null;
-let replyCtx = null;
 
 for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
 for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
@@ -45,33 +45,23 @@ async function load() {
   $('who').textContent = state?.email || '';
 }
 
-async function open(m) {
-  const r = await call({ action: 'get', folder: m.folder, uid: m.uid });
-  if (!r.ok) { $('list').textContent = r.error; return; }
-  current = r.result;
-  $('d-subject').textContent = current.subject;
-  $('d-meta').textContent = `${current.from} <${current.fromAddress}> · ${current.date ? new Date(current.date).toLocaleString() : ''}`;
-  $('d-body').srcdoc = current.html || `<pre style="white-space:pre-wrap;font:13px sans-serif">${esc(current.text)}</pre>`;
-  const code = $('d-code');
-  code.hidden = !current.code;
-  if (current.code) {
-    code.textContent = `${t('codeLabel')}: ${current.code} `;
+function open(m) {
+  current = m;
+  $('d-subject').textContent = m.subject;
+  $('d-meta').textContent = `${m.from} <${m.fromAddress}> · ${m.date ? new Date(m.date).toLocaleString() : ''}`;
+  $('d-body').srcdoc = `<pre style="white-space:pre-wrap;font:13px sans-serif">${esc(m.preview)}</pre>`;
+  const code = findVerificationCode(`${m.subject} ${m.preview}`);
+  const box = $('d-code');
+  box.hidden = !code;
+  if (code) {
+    box.textContent = `${t('codeLabel')}: ${code} `;
     const c = document.createElement('button'); c.textContent = t('copy');
-    c.onclick = () => navigator.clipboard.writeText(current.code);
-    code.append(c);
+    c.onclick = () => navigator.clipboard.writeText(code);
+    box.append(c);
   }
-  const inv = $('d-invite');
-  inv.hidden = !current.invitation;
-  if (current.invitation) renderInvite(inv, current.invitation);
-  $('d-att').replaceChildren(...current.attachments.map((a) => {
-    const li = document.createElement('li');
-    const l = document.createElement('a'); l.textContent = `${a.name} (${Math.round((a.size || 0) / 1024)} KB)`;
-    l.href = a.url; l.target = '_blank'; l.rel = 'noreferrer';
-    li.append(l); return li;
-  }));
-  $('act-read').textContent = current.unread ? t('markRead') : t('markUnread');
+  $('d-invite').hidden = true;
+  $('d-att').replaceChildren();
   show('detail');
-  if (current.unread) call({ action: 'read', folder: current.folder, uids: [current.uid], read: true });
 }
 
 function renderInvite(box, inv) {
@@ -88,22 +78,11 @@ function renderInvite(box, inv) {
 }
 
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-const act = (name, extra = {}) => async () => {
-  await call({ action: name, folder: current.folder, uids: [current.uid], ...extra });
-  load();
-};
-
-$('act-read').onclick = () => act('read', { read: !!current.unread })();
-$('act-star').onclick = () => act('star', { on: !current.starred })();
-$('act-archive').onclick = act('archive');
-$('act-trash').onclick = act('trash');
 $('back').onclick = load;
 $('refresh').onclick = load;
 $('settings').onclick = () => chrome.runtime.openOptionsPage();
 $('signinBtn').onclick = () => call({ action: 'signIn' });
-$('compose').onclick = () => openComposer(null);
-$('act-reply').onclick = () => openComposer(current);
-$('c-cancel').onclick = load;
+$('open-web').onclick = () => call({ action: 'openWeb' });
 
 for (const b of document.querySelectorAll('#tabs button')) {
   b.onclick = () => {
@@ -111,24 +90,5 @@ for (const b of document.querySelectorAll('#tabs button')) {
     b.classList.add('on'); folder = b.dataset.folder; load();
   };
 }
-
-function openComposer(reply) {
-  replyCtx = reply;
-  $('c-to').value = reply ? reply.fromAddress : '';
-  $('c-subject').value = reply ? (/^re:/i.test(reply.subject) ? reply.subject : `Re: ${reply.subject}`) : '';
-  $('c-body').value = reply ? `\n\n> ${reply.text.split('\n').join('\n> ')}` : '';
-  $('c-status').textContent = '';
-  show('composer');
-}
-
-$('c-send').onclick = async () => {
-  const to = $('c-to').value.split(/[,;\s]+/).filter(Boolean);
-  if (!to.length) return;
-  const r = await call({
-    action: 'send', to, subject: $('c-subject').value, body: $('c-body').value,
-    inReplyTo: replyCtx?.messageId || ''
-  });
-  if (r.ok) load(); else $('c-status').textContent = r.error;
-};
 
 load();

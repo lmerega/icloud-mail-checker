@@ -1,4 +1,4 @@
-# LibreMail for iCloud
+# iCloud Mail Checker
 
 Unofficial, free and open-source Chrome (Manifest V3) extension to check and
 manage iCloud Mail from the toolbar. Sister project of
@@ -10,10 +10,9 @@ manage iCloud Mail from the toolbar. Sister project of
 ## Features
 
 - Unread badge and desktop notifications.
-- Folder views (inbox, archive, sent, trash), message preview.
-- Mark read/unread, star, archive, delete, reply and compose.
+- Folder views (inbox, archive, sent, trash) with sender, subject and preview.
 - Verification-code detection with one-click copy.
-- Calendar invitation parsing with accept / maybe / decline.
+- Open any message in iCloud Mail with one click.
 - Settings export/import (preferences only). English and Italian.
 
 ## How it works
@@ -29,7 +28,9 @@ asked for or stored, and no data passes through a server of this project.
   in `background/constants.js` and `background/icloud-api.js` and may need
   adjusting against a real session.
 - One iCloud session per Chrome profile (cookies), so one account at a time.
-- Attachment upload while composing is not wired up yet.
+- Reading full message bodies, mark read/archive/delete/star and sending are not
+  available yet: the web app uses a different internal API for them, still being
+  mapped. Those features exist in the code but are hidden until verified.
 
 ## Install from source
 

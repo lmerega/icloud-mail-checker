@@ -1,9 +1,9 @@
 {
   "appName": {
-    "message": "LibreMail per iCloud"
+    "message": "iCloud Mail Checker"
   },
   "appShortName": {
-    "message": "LibreMail iCloud"
+    "message": "iCloud Mail Checker"
   },
   "appDescription": {
     "message": "Companion non ufficiale, gratuito e open source per iCloud Mail: controllo posta, notifiche e azioni rapide."
@@ -97,5 +97,8 @@
   },
   "importError": {
     "message": "File non valido"
+  },
+  "openInICloud": {
+    "message": "Apri su iCloud"
   }
 }
