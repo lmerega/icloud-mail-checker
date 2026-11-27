@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const t = (k) => chrome.i18n.getMessage(k) || k;
-const DEFAULTS = { pollMinutes: 1, notifications: true, badge: true, theme: 'auto' };
+const DEFAULTS = { pollMinutes: 1, notifications: true, badge: true, sound: true, theme: 'auto' };
 const THEMES = ['auto', 'light', 'dark'];
 const applyTheme = (th) => { if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; };
 const INTERVALS = [0.5, 1, 2, 5, 10, 15, 30];
@@ -25,17 +25,18 @@ async function load() {
   $('poll').value = String(nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes));
   $('notif').checked = !!s.notifications;
   $('badge').checked = !!s.badge;
+  $('sound').checked = !!s.sound;
   $('theme').value = THEMES.includes(s.theme) ? s.theme : 'auto';
   applyTheme($('theme').value);
 }
 
 async function save() {
   await chrome.storage.sync.set({
-    settings: { pollMinutes: Number($('poll').value), notifications: $('notif').checked, badge: $('badge').checked, theme: $('theme').value }
+    settings: { pollMinutes: Number($('poll').value), notifications: $('notif').checked, badge: $('badge').checked, sound: $('sound').checked, theme: $('theme').value }
   });
   saved();
 }
-for (const id of ['poll', 'notif', 'badge', 'theme']) $(id).addEventListener('change', save);
+for (const id of ['poll', 'notif', 'badge', 'sound', 'theme']) $(id).addEventListener('change', save);
 $('theme').addEventListener('change', () => applyTheme($('theme').value));
 
 // Export/import: preferences only, never cookies or message data.
@@ -53,7 +54,7 @@ $('file').onchange = async (e) => {
     if (j.app !== 'icloud-mail-checker') throw new Error('format');
     const s = j.settings || {};
     await chrome.storage.sync.set({ settings: {
-      pollMinutes: nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes), notifications: !!s.notifications, badge: !!s.badge, theme: THEMES.includes(s.theme) ? s.theme : 'auto'
+      pollMinutes: nearest(Number(s.pollMinutes) || DEFAULTS.pollMinutes), notifications: !!s.notifications, badge: !!s.badge, sound: s.sound !== false, theme: THEMES.includes(s.theme) ? s.theme : 'auto'
     } });
     await load(); saved();
   } catch { $('msg').textContent = t('importError'); }

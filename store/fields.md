@@ -49,6 +49,11 @@ Giustificazione declarativeNetRequestWithHostAccess:
 Sets the Origin and Referer headers on the extension's own requests to icloud.com, which the iCloud web service requires. Applies only to icloud.com and only to this extension's requests.
 ```
 
+Giustificazione offscreen:
+```
+Plays an optional sound when new mail arrives. Service workers cannot play audio, so a hidden offscreen page (reason AUDIO_PLAYBACK) plays a short synthesized tone. Nothing is recorded or captured.
+```
+
 Codice remoto: No, non uso codice remoto.
 
 Dati raccolti: spunta "Comunicazioni personali" (la posta e' gestita solo localmente e scambiata con Apple).

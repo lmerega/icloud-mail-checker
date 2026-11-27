@@ -29,6 +29,7 @@ operated by the developer. Data is never sold or shared.
 - `storage`: save preferences and the last unread count.
 - `alarms`: check for new mail periodically.
 - `notifications`: optional desktop notifications for new mail.
+- `offscreen`: play the optional "new mail" sound (service workers cannot play audio). No audio is recorded or captured.
 - `declarativeNetRequestWithHostAccess`: set the Origin/Referer headers iCloud expects on
   the extension's own requests to icloud.com.
 

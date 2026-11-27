@@ -15,6 +15,18 @@ export async function scheduleAlarm() {
   await chrome.alarms.create(ALARM, { periodInMinutes: Math.max(0.5, Number(s.pollMinutes) || DEFAULTS.pollMinutes) });
 }
 
+async function ding() {
+  try {
+    const ctxs = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
+    if (!ctxs.length) {
+      await chrome.offscreen.createDocument({
+        url: 'offscreen/offscreen.html', reasons: ['AUDIO_PLAYBACK'], justification: 'Play a sound when new mail arrives'
+      });
+    }
+    await chrome.runtime.sendMessage({ target: 'offscreen', type: 'ding' });
+  } catch { /* sound is a nicety: never break the check */ }
+}
+
 async function setBadge(unread, signedIn) {
   const s = await getSettings();
   const text = !signedIn ? '!' : s.badge && unread > 0 ? (unread > 99 ? '99+' : String(unread)) : '';
@@ -43,11 +55,13 @@ export async function poll(force = false) {
     const { seen = [] } = await chrome.storage.local.get('seen');
     const fresh = unread.filter((m) => !seen.includes(m.uid));
     const settings = await getSettings();
+    if (seen.length && fresh.length && settings.sound) await ding();
     if (settings.notifications && seen.length) {
       for (const m of fresh.slice(0, 5)) {
         const code = findVerificationCode(`${m.subject} ${m.preview}`);
         await chrome.notifications.create(`m-${m.uid}`, {
           type: 'basic',
+          silent: !!settings.sound,
           iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
           title: m.from || chrome.i18n.getMessage('newMail'),
           message: code ? `${chrome.i18n.getMessage('codeLabel')}: ${code}` : m.subject

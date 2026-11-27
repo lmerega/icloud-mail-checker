@@ -54,6 +54,7 @@ Show and manage the user's iCloud Mail from the browser toolbar.
 - alarms: periodic mail check (every 1-60 minutes).
 - notifications: optional alerts for new mail.
 - declarativeNetRequestWithHostAccess: sets Origin/Referer on the extension's requests to icloud.com only.
+- offscreen: plays the optional "new mail" sound from a hidden page (reason AUDIO_PLAYBACK). Nothing is recorded.
 - Remote code: none.
 
 ## Data usage declarations

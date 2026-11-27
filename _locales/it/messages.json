@@ -250,5 +250,8 @@
   },
   "trashLeft": {
     "message": "Nel cestino restano {n} conversazioni"
+  },
+  "soundLabel": {
+    "message": "Suono quando arriva una mail"
   }
 }

@@ -20,5 +20,6 @@ export const DEFAULTS = {
   pollMinutes: 1,
   notifications: true,
   badge: true,
+  sound: true,
   theme: 'auto'
 };

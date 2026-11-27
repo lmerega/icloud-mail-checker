@@ -250,5 +250,8 @@
   },
   "trashLeft": {
     "message": "{n} conversations are still in the trash"
+  },
+  "soundLabel": {
+    "message": "Sound when new mail arrives"
   }
 }
