@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { findVerificationCode } from '../lib/codes.js';
+import { parseSender, normalizeThread } from '../background/icloud-api.js';
 import { parseInvitation, buildReply } from '../lib/ics.js';
 
 test('detects verification codes', () => {
@@ -27,4 +28,10 @@ test('manifest and locales are consistent', () => {
   const it = JSON.parse(fs.readFileSync(new URL('../_locales/it/messages.json', import.meta.url)));
   assert.deepEqual(Object.keys(en).sort(), Object.keys(it).sort());
   for (const f of Object.values(m.icons)) assert.ok(fs.existsSync(new URL('../' + f, import.meta.url)));
+});
+
+test('parses thread digests', () => {
+  assert.deepEqual(parseSender('"Acme & Co." <a@x.invalid>'), { name: 'Acme & Co.', address: 'a@x.invalid' });
+  const m = normalizeThread({ threadId: 't1', senders: ['B <b@x.invalid>'], flags: ['\Seen'], timestamp: 0 }, 'INBOX');
+  assert.equal(m.unread, false);
 });

@@ -36,11 +36,12 @@ export async function installHeaderRules() {
 
 export function parseValidate(json) {
   const mailUrl = json?.webservices?.mail?.url || json?.webservices?.mailws?.url;
+  const gw = json?.webservices?.mccgateway?.url;
   const dsid = json?.dsInfo?.dsid;
   if (!mailUrl || !dsid) return null;
   const email = json.dsInfo.appleId || json.dsInfo.primaryEmail || '';
   const name = [json.dsInfo.firstName, json.dsInfo.lastName].filter(Boolean).join(' ');
-  return { dsid: String(dsid), mailUrl: mailUrl.replace(/:443$/, '').replace(/\/$/, ''), email, name, at: Date.now() };
+  return { gateway: gw ? gw.replace(/:443$/, '').replace(/\/$/, '') : '', dsid: String(dsid), mailUrl: mailUrl.replace(/:443$/, '').replace(/\/$/, ''), email, name, at: Date.now() };
 }
 
 /** Uses the existing icloud.com browser session (cookies). */
@@ -90,11 +91,57 @@ export function normalizeMessage(m, folder) {
   };
 }
 
-export async function listMessages(folder = FOLDERS.inbox, count = 30) {
-  const r = await rpc(METHODS.listMessages, {
-    guid: fid(folder), sorttype: 'Date', sortorder: 'descending', startindex: 1, count
+// Verified 2026-11-27 against the live web app: POST {mccgateway}/mailws2/v1/thread/search
+// (application/json). Folder ids are plain IMAP names ("INBOX", "Archive").
+export async function gatewayPost(path, body) {
+  const s = await getSession();
+  if (!s.gateway) throw new Error('mccgateway not available');
+  const res = await fetch(`${s.gateway}${path}?${qs({ clientId: clientId(), dsid: s.dsid })}`, {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
-  return (r?.messages || r || []).map((m) => normalizeMessage(m, folder));
+  if (res.status === 401 || res.status === 421) { clearSession(); throw new AuthError('session expired'); }
+  if (!res.ok) throw new Error(`${path} ${res.status}`);
+  return res.json();
+}
+
+function clientId() {
+  if (!globalThis.__cid) globalThis.__cid = crypto.randomUUID();
+  return globalThis.__cid;
+}
+
+const SESSION_HEADERS = (folder) => ({ folder, modseq: null, threadmodseq: null, condstore: 1, qresync: 1, threadmode: 1 });
+
+export function parseSender(s) {
+  const m = /^s*"?(.*?)"?s*<([^>]*)>s*$/.exec(s || '');
+  return m ? { name: m[1].trim().replace(/^"|"$/g, ''), address: m[2].trim() } : { name: s || '', address: s || '' };
+}
+
+export function normalizeThread(t, folder) {
+  const flags = t.flags || [];
+  const snd = parseSender((t.senders || [])[0]);
+  return {
+    uid: String(t.threadId), threadId: String(t.threadId), folder,
+    from: snd.name || snd.address, fromAddress: snd.address,
+    subject: t.subject || '', preview: t.preview || '',
+    date: t.timestamp ? new Date(t.timestamp).toISOString() : null,
+    unread: !flags.includes('\Seen'), starred: flags.includes('\Flagged'),
+    hasAttachments: flags.includes('\HasAttachment'), count: t.count || 1
+  };
+}
+
+export async function listMessages(folder = FOLDERS.inbox, count = 30) {
+  const r = await gatewayPost('/mailws2/v1/thread/search', {
+    responseType: 'THREAD_DIGEST', includeFolderStatus: true, maxResults: count, sessionHeaders: SESSION_HEADERS(folder)
+  });
+  return (r.threadList || []).map((t) => normalizeThread(t, folder));
+}
+
+export async function unreadCount(folder = FOLDERS.inbox) {
+  const r = await gatewayPost('/mailws2/v1/thread/search', {
+    responseType: 'THREAD_ID_AND_DATE', includeFolderStatus: true, maxResults: 1, sessionHeaders: SESSION_HEADERS(folder)
+  });
+  return r.folderStatus?.unseenUndeletedMessages ?? 0;
 }
 
 export async function getMessage(folder, uid) {

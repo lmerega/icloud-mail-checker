@@ -27,8 +27,8 @@ const actions = {
     const out = {};
     try { const s = await api.getSession(true); out.session = { mail: s.mailUrl.replace(/p\d+/, 'pNN'), hasDsid: !!s.dsid }; }
     catch (e) { return { session: 'FAIL ' + e.message }; }
-    for (const [name, fn] of [['folders', () => api.rawRpc('/wm/folder', 'list', {})],
-      ['messages', () => api.rawRpc('/wm/message', 'list', { guid: 'folder:INBOX', sorttype: 'Date', sortorder: 'descending', startindex: 1, count: 1 })]]) {
+    for (const [name, fn] of [['list', () => api.listMessages('INBOX', 2)],['unread', () => api.unreadCount('INBOX')],
+      ['sent', () => api.listMessages('Sent Messages', 1)], ['trash', () => api.listMessages('Deleted Messages', 1)]]) {
       try { out[name] = shape(await fn()); } catch (e) { out[name] = 'FAIL ' + e.message; }
     }
     return out;

@@ -1,4 +1,4 @@
-import { listMessages, getSession, AuthError } from './icloud-api.js';
+import { listMessages, unreadCount, getSession, AuthError } from './icloud-api.js';
 import { DEFAULTS, FOLDERS } from './constants.js';
 import { findVerificationCode } from '../lib/codes.js';
 
@@ -26,6 +26,7 @@ export async function poll() {
     const sess = await getSession();
     const msgs = await listMessages(FOLDERS.inbox, 30);
     const unread = msgs.filter((m) => m.unread);
+    const total = await unreadCount(FOLDERS.inbox);
     const { seen = [] } = await chrome.storage.local.get('seen');
     const fresh = unread.filter((m) => !seen.includes(m.uid));
     const settings = await getSettings();
@@ -42,9 +43,9 @@ export async function poll() {
     }
     await chrome.storage.local.set({
       seen: unread.map((m) => m.uid).slice(0, 200),
-      state: { signedIn: true, email: sess.email, unread: unread.length, checkedAt: Date.now() }
+      state: { signedIn: true, email: sess.email, unread: total, checkedAt: Date.now() }
     });
-    await setBadge(unread.length, true);
+    await setBadge(total, true);
   } catch (e) {
     const signedIn = !(e instanceof AuthError) && (await chrome.storage.local.get('state')).state?.signedIn;
     await chrome.storage.local.set({ state: { signedIn: !!signedIn, error: String(e.message || e), unread: 0 } });
