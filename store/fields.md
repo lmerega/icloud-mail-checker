@@ -1,7 +1,6 @@
 # Chrome Web Store - campi da incollare
 
 Ordine come nel dashboard. Ogni blocco va copiato intero.
-Riassunto EN: 104 caratteri, IT: 102 (massimo 132).
 
 ## 1. Pacchetto
 File da caricare: dist/icloud-mail-checker.zip (genera con: npm run pack)
@@ -10,20 +9,9 @@ File da caricare: dist/icloud-mail-checker.zip (genera con: npm run pack)
 
 Lingua predefinita: English. Poi "Aggiungi lingua" -> Italiano.
 
-Nome (EN e IT):
-```
-iCloud Mail Checker
-```
-
-Riassunto EN:
-```
-Check and manage your iCloud Mail from the toolbar: unread badge, notifications, search, read and reply.
-```
-
-Riassunto IT:
-```
-Controlla e gestisci iCloud Mail dalla barra: badge non letti, notifiche, ricerca, lettura e risposta.
-```
+Titolo e riepilogo NON si compilano: il dashboard li legge dal pacchetto
+(manifest + _locales, campi appName e appDescription, max 132 caratteri).
+Si compila: Descrizione (da store/listing.md), Categoria, icona, screenshot.
 
 Categoria: Produttivita (Productivity)
 Icona dello store: icons/icon-128.png
