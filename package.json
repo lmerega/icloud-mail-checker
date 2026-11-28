@@ -1,12 +1,12 @@
 {
-  "name": "icloud-mail-checker",
-  "version": "1.0.0",
+  "name": "zoho-mail-checker",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "license": "MIT",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "pack": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && git archive --format=zip -o dist/icloud-mail-checker.zip HEAD"
+    "pack": "node scripts/pack.mjs"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",

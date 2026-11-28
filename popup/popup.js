@@ -1,15 +1,17 @@
 import { icon, paintIcons } from './icons.js';
 import { quoteForReply } from '../lib/text.js';
 import { renderMail, buildReplyHtml, sanitizeHtml } from '../lib/sanitize.js';
+import { initI18n, paintI18n, t } from '../lib/i18n.js';
+
+await initI18n();
 
 const $ = (id) => document.getElementById(id);
-const t = (k) => chrome.i18n.getMessage(k) || k;
 const call = (m) => chrome.runtime.sendMessage(m);
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
 const VIEWS = ['v-main', 'v-detail', 'v-composer'];
 const PALETTE = ['#e8710a', '#1a73e8', '#188038', '#a142f4', '#d93025', '#129eaf', '#b06000', '#5f6368', '#c2185b'];
-let folder = 'INBOX';
+let folder = 'inbox';
 let current = null;
 let listItems = []; // messages of the list the user is browsing
 let listPos = -1;
@@ -21,9 +23,7 @@ chrome.storage.sync.get('settings').then(({ settings }) => applyTheme(settings?.
 chrome.storage.onChanged.addListener((ch, area) => { if (area === 'sync' && ch.settings) applyTheme(ch.settings.newValue?.theme); });
 
 if (new URLSearchParams(location.search).has('tab')) document.body.classList.add('tab');
-for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
-for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
-for (const el of document.querySelectorAll('[data-i18n-ph]')) el.placeholder = t(el.dataset.i18nPh);
+paintI18n();
 paintIcons();
 $('title').textContent = t('appShortName');
 
@@ -134,7 +134,7 @@ async function load() {
     return;
   }
   listItems = r.result;
-  $('trashbar').hidden = !(folder === 'Deleted Messages' && !query && r.result.length);
+  $('trashbar').hidden = !(folder === 'trash' && !query && r.result.length);
   $('trash-confirm').hidden = true;
   list.replaceChildren(...r.result.map(row));
 }
@@ -334,7 +334,7 @@ $('refresh').onclick = async () => { await call({ action: 'poll' }); home(); };
 $('newtab').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('popup/popup.html?tab=1') });
 $('menu-top').onclick = (e) => { e.stopPropagation(); $('menu').hidden = !$('menu').hidden; };
 document.addEventListener('click', () => { $('menu').hidden = true; });
-$('open-icloud').onclick = () => call({ action: 'openWeb' });
+$('open-zoho').onclick = () => call({ action: 'openWeb' });
 $('m-web').onclick = () => call({ action: 'openWeb' });
 $('m-options').onclick = () => chrome.runtime.openOptionsPage();
 $('signinBtn').onclick = () => call({ action: 'signIn' });

@@ -1,15 +1,17 @@
-iCloud Mail Checker puts your iCloud Mail in the Chrome toolbar.
+Zoho Mail Checker puts your Zoho Mail in the Chrome toolbar.
 
 • Unread badge, desktop notifications and an optional sound when new mail arrives
 • Inbox, Archive, Sent and Trash with search; empty the trash in one click
-• Read whole conversations, with remote images and trackers blocked
+• Read messages in the popup, with remote images and trackers blocked
 • Mark read/unread, star, archive and delete from the popup or with hover buttons
 • Go to the previous or next message without going back to the list
 • Reply in HTML to HTML mail with an inline editor, or write a new message
 • Verification codes detected and copied in one click
 • Light, dark or automatic theme; English and Italian; settings export/import
 
-No password is requested or stored: sign in once at icloud.com and the extension uses that session. Mail goes only between your browser and Apple; the developer receives nothing.
+Private by design: the extension talks only to Zoho, through the official Zoho Mail API, with an OAuth client you create yourself in the Zoho API Console (free, about 2 minutes, step-by-step guide in the options). Your password is never seen; Client Secret and tokens stay in your browser. There is no developer server: the developer receives nothing.
 
-Unofficial and independent. Not affiliated with, endorsed or sponsored by Apple Inc. iCloud is a trademark of Apple Inc.
-Open source (MIT): github.com/lmerega/icloud-mail-checker
+Works with every Zoho data center (zoho.com, zoho.eu, zoho.in, zoho.com.au, zoho.jp, zohocloud.ca, zoho.sa, zoho.uk, zoho.com.cn).
+
+Unofficial and independent. Not affiliated with, endorsed or sponsored by Zoho Corporation. Zoho is a trademark of Zoho Corporation.
+Open source (MIT): github.com/lmerega/zoho-mail-checker

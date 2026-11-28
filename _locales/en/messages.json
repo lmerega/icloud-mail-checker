@@ -1,12 +1,12 @@
 {
   "appName": {
-    "message": "iCloud Mail Checker"
+    "message": "Zoho Mail Checker"
   },
   "appShortName": {
-    "message": "iCloud Mail Checker"
+    "message": "Zoho Mail Checker"
   },
   "appDescription": {
-    "message": "Unofficial, free and open-source iCloud Mail companion: inbox checks, notifications and everyday mail actions."
+    "message": "Unofficial, free and open-source Zoho Mail companion: inbox checks, notifications and everyday mail actions."
   },
   "inbox": {
     "message": "Inbox"
@@ -30,10 +30,10 @@
     "message": "Settings"
   },
   "signIn": {
-    "message": "Sign in to iCloud"
+    "message": "Connect Zoho Mail"
   },
   "signInHint": {
-    "message": "Sign in at icloud.com in this browser, then reopen this popup."
+    "message": "Connect your Zoho Mail account in the options page, then reopen this popup."
   },
   "empty": {
     "message": "No messages"
@@ -98,8 +98,8 @@
   "importError": {
     "message": "Invalid file"
   },
-  "openInICloud": {
-    "message": "Open in iCloud"
+  "openInZoho": {
+    "message": "Open in Zoho Mail"
   },
   "search": {
     "message": "Search"
@@ -131,8 +131,8 @@
   "star": {
     "message": "Star"
   },
-  "openICloudMail": {
-    "message": "Open iCloud Mail"
+  "openZohoMail": {
+    "message": "Open Zoho Mail"
   },
   "signedOut": {
     "message": "Not signed in"
@@ -189,7 +189,7 @@
     "message": "30 seconds"
   },
   "pollNote": {
-    "message": "iCloud cannot push mail to extensions, so the extension checks at this interval with a very light request. Shorter means new mail shows up sooner."
+    "message": "Zoho cannot push mail to extensions, so the extension checks at this interval with a very light request. Shorter means new mail shows up sooner."
   },
   "sectionBackup": {
     "message": "Backup"
@@ -201,13 +201,13 @@
     "message": "Connection check"
   },
   "connHint": {
-    "message": "If something does not work, open icloud.com in this browser, sign in, and check again."
+    "message": "If something does not work, reconnect your Zoho account above and check again."
   },
   "runCheck": {
     "message": "Check now"
   },
   "connSession": {
-    "message": "Signed in to iCloud"
+    "message": "Connected to Zoho"
   },
   "connInbox": {
     "message": "Inbox can be read"
@@ -280,5 +280,92 @@
   },
   "sndAlert": {
     "message": "Alert"
+  },
+  "sectionAccount": {
+    "message": "Zoho account"
+  },
+  "setupHint": {
+    "message": "The extension talks to Zoho with your own free API client: you create it once in the Zoho API Console (about 2 minutes), then paste its Client ID and Client Secret below."
+  },
+  "redirectLabel": {
+    "message": "Authorized redirect URI"
+  },
+  "regionLabel": {
+    "message": "Data center"
+  },
+  "secretNote": {
+    "message": "Client ID, Client Secret and the access token stay in this browser and are sent only to Zoho."
+  },
+  "connect": {
+    "message": "Connect to Zoho"
+  },
+  "reconnect": {
+    "message": "Reconnect"
+  },
+  "disconnect": {
+    "message": "Disconnect"
+  },
+  "connectedAs": {
+    "message": "Connected as"
+  },
+  "notConnected": {
+    "message": "Not connected."
+  },
+  "missingCredentials": {
+    "message": "Client ID and Client Secret are required."
+  },
+  "waitingZoho": {
+    "message": "Waiting for the Zoho sign-in window…"
+  },
+  "connectFailed": {
+    "message": "Connection failed"
+  },
+  "disconnected": {
+    "message": "Disconnected: access revoked on Zoho."
+  },
+  "guideTitle": {
+    "message": "How to get Client ID and Client Secret"
+  },
+  "guide1": {
+    "message": "Open the Zoho API Console of your data center: {link} (sign in with your Zoho account). Change the data center below if your mail is not on this one."
+  },
+  "guide2": {
+    "message": "Click \"Add Client\" (or \"Get Started\" the first time) and choose \"Server-based Applications\"."
+  },
+  "guide3": {
+    "message": "Client Name: anything, e.g. Zoho Mail Checker. Homepage URL: {home}"
+  },
+  "guide4": {
+    "message": "Authorized Redirect URIs: paste exactly {uri} (use the Copy button below: no spaces, no trailing slash)."
+  },
+  "guide5": {
+    "message": "Press \"Create\", then open the \"Client Secret\" tab: copy Client ID and Client Secret into the fields below."
+  },
+  "guide6": {
+    "message": "Press \"Connect to Zoho\", sign in on the Zoho page that opens and accept the requested permissions (read and manage your mail)."
+  },
+  "openConsole": {
+    "message": "Open Zoho API Console"
+  },
+  "troubleTitle": {
+    "message": "Something went wrong?"
+  },
+  "trouble1": {
+    "message": "\"Invalid Redirect Uri\": the redirect URI in the API Console must match the one below character by character. Edit the client there and paste it again."
+  },
+  "trouble2": {
+    "message": "\"invalid_client\": Client ID or Secret are wrong, or the client was created in a different data center than the one selected here."
+  },
+  "trouble3": {
+    "message": "The badge shows \"!\": access was revoked or expired. Press \"Reconnect\"."
+  },
+  "trouble4": {
+    "message": "Client Secret and tokens stay in this browser only and are sent only to Zoho; \"Disconnect\" also revokes access on Zoho."
+  },
+  "langLabel": {
+    "message": "Language"
+  },
+  "langAuto": {
+    "message": "Browser language"
   }
 }

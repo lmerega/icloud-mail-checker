@@ -1,15 +1,17 @@
-iCloud Mail Checker porta iCloud Mail nella barra di Chrome.
+Zoho Mail Checker porta Zoho Mail nella barra di Chrome.
 
 • Badge dei non letti, notifiche desktop e suono facoltativo quando arriva una mail
 • Posta, Archivio, Inviata e Cestino con ricerca; svuota il cestino con un clic
-• Conversazioni complete, con immagini remote e tracker bloccati
+• Leggi i messaggi nel popup, con immagini remote e tracker bloccati
 • Segna letto/non letto, preferiti, archivia ed elimina dal popup o con i pulsanti al passaggio del mouse
-• Passa alla mail precedente o successiva senza tornare all'elenco
-• Risposte in HTML alle mail HTML con editor integrato, o nuovo messaggio
+• Passa al messaggio precedente o successivo senza tornare all'elenco
+• Rispondi in HTML alle mail HTML con l'editor integrato, o scrivi un nuovo messaggio
 • Codici di verifica riconosciuti e copiati con un clic
 • Tema chiaro, scuro o automatico; italiano e inglese; esporta/importa impostazioni
 
-Nessuna password richiesta o salvata: accedi una volta a icloud.com e l'estensione usa quella sessione. La posta passa solo tra il tuo browser e Apple; lo sviluppatore non riceve nulla.
+Riservata per costruzione: l'estensione parla solo con Zoho, tramite le API ufficiali di Zoho Mail, con un client OAuth che crei tu nella Zoho API Console (gratis, circa 2 minuti, guida passo passo nelle opzioni). La tua password non viene mai vista; Client Secret e token restano nel tuo browser. Non esiste un server dello sviluppatore: lo sviluppatore non riceve nulla.
 
-Non ufficiale e indipendente. Non affiliata né approvata da Apple Inc. iCloud è un marchio di Apple Inc.
-Open source (MIT): github.com/lmerega/icloud-mail-checker
+Funziona con tutti i data center Zoho (zoho.com, zoho.eu, zoho.in, zoho.com.au, zoho.jp, zohocloud.ca, zoho.sa, zoho.uk, zoho.com.cn).
+
+Non ufficiale e indipendente. Non affiliata né approvata da Zoho Corporation. Zoho è un marchio di Zoho Corporation.
+Open source (MIT): github.com/lmerega/zoho-mail-checker

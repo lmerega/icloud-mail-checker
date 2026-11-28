@@ -1,12 +1,12 @@
 {
   "appName": {
-    "message": "iCloud Mail Checker"
+    "message": "Zoho Mail Checker"
   },
   "appShortName": {
-    "message": "iCloud Mail Checker"
+    "message": "Zoho Mail Checker"
   },
   "appDescription": {
-    "message": "Companion non ufficiale, gratuito e open source per iCloud Mail: controllo posta, notifiche e azioni rapide."
+    "message": "Companion non ufficiale, gratuito e open source per Zoho Mail: controllo posta, notifiche e azioni rapide."
   },
   "inbox": {
     "message": "Posta"
@@ -30,10 +30,10 @@
     "message": "Impostazioni"
   },
   "signIn": {
-    "message": "Accedi a iCloud"
+    "message": "Collega Zoho Mail"
   },
   "signInHint": {
-    "message": "Accedi a icloud.com in questo browser, poi riapri questo popup."
+    "message": "Collega il tuo account Zoho Mail nelle opzioni, poi riapri questo popup."
   },
   "empty": {
     "message": "Nessun messaggio"
@@ -98,8 +98,8 @@
   "importError": {
     "message": "File non valido"
   },
-  "openInICloud": {
-    "message": "Apri su iCloud"
+  "openInZoho": {
+    "message": "Apri su Zoho Mail"
   },
   "search": {
     "message": "Cerca"
@@ -131,8 +131,8 @@
   "star": {
     "message": "Preferito"
   },
-  "openICloudMail": {
-    "message": "Apri iCloud Mail"
+  "openZohoMail": {
+    "message": "Apri Zoho Mail"
   },
   "signedOut": {
     "message": "Non connesso"
@@ -189,7 +189,7 @@
     "message": "30 secondi"
   },
   "pollNote": {
-    "message": "iCloud non invia la posta alle estensioni: l'estensione controlla a questo intervallo con una richiesta molto leggera. Più breve significa vedere prima la nuova posta."
+    "message": "Zoho non invia la posta alle estensioni: l'estensione controlla a questo intervallo con una richiesta molto leggera. Più breve significa vedere prima la nuova posta."
   },
   "sectionBackup": {
     "message": "Copia delle impostazioni"
@@ -201,13 +201,13 @@
     "message": "Verifica della connessione"
   },
   "connHint": {
-    "message": "Se qualcosa non funziona, apri icloud.com in questo browser, accedi e verifica di nuovo."
+    "message": "Se qualcosa non funziona, ricollega l'account Zoho qui sopra e verifica di nuovo."
   },
   "runCheck": {
     "message": "Verifica ora"
   },
   "connSession": {
-    "message": "Accesso a iCloud"
+    "message": "Accesso a Zoho"
   },
   "connInbox": {
     "message": "La posta in arrivo si legge"
@@ -280,5 +280,92 @@
   },
   "sndAlert": {
     "message": "Allarme"
+  },
+  "sectionAccount": {
+    "message": "Account Zoho"
+  },
+  "setupHint": {
+    "message": "L'estensione parla con Zoho tramite un tuo client API gratuito: lo crei una volta sola nella Zoho API Console (circa 2 minuti), poi incolli qui sotto Client ID e Client Secret."
+  },
+  "redirectLabel": {
+    "message": "Redirect URI autorizzato"
+  },
+  "regionLabel": {
+    "message": "Data center"
+  },
+  "secretNote": {
+    "message": "Client ID, Client Secret e il token di accesso restano in questo browser e vengono inviati solo a Zoho."
+  },
+  "connect": {
+    "message": "Collega a Zoho"
+  },
+  "reconnect": {
+    "message": "Ricollega"
+  },
+  "disconnect": {
+    "message": "Scollega"
+  },
+  "connectedAs": {
+    "message": "Collegato come"
+  },
+  "notConnected": {
+    "message": "Non collegato."
+  },
+  "missingCredentials": {
+    "message": "Client ID e Client Secret sono obbligatori."
+  },
+  "waitingZoho": {
+    "message": "In attesa della finestra di accesso Zoho…"
+  },
+  "connectFailed": {
+    "message": "Collegamento non riuscito"
+  },
+  "disconnected": {
+    "message": "Scollegato: accesso revocato su Zoho."
+  },
+  "guideTitle": {
+    "message": "Come ottenere Client ID e Client Secret"
+  },
+  "guide1": {
+    "message": "Apri la Zoho API Console del tuo data center: {link} (accedi con il tuo account Zoho). Se la tua posta è su un altro data center, cambialo qui sotto."
+  },
+  "guide2": {
+    "message": "Clicca \"Add Client\" (o \"Get Started\" la prima volta) e scegli \"Server-based Applications\"."
+  },
+  "guide3": {
+    "message": "Client Name: quello che vuoi, es. Zoho Mail Checker. Homepage URL: {home}"
+  },
+  "guide4": {
+    "message": "Authorized Redirect URIs: incolla esattamente {uri} (usa il pulsante Copia qui sotto: niente spazi né barra finale)."
+  },
+  "guide5": {
+    "message": "Premi \"Create\", poi apri la scheda \"Client Secret\": copia Client ID e Client Secret nei campi qui sotto."
+  },
+  "guide6": {
+    "message": "Premi \"Collega a Zoho\", accedi nella pagina Zoho che si apre e accetta i permessi richiesti (lettura e gestione della posta)."
+  },
+  "openConsole": {
+    "message": "Apri la Zoho API Console"
+  },
+  "troubleTitle": {
+    "message": "Qualcosa non va?"
+  },
+  "trouble1": {
+    "message": "\"Invalid Redirect Uri\": il redirect URI nella API Console deve coincidere carattere per carattere con quello qui sotto. Modifica il client lì e incollalo di nuovo."
+  },
+  "trouble2": {
+    "message": "\"invalid_client\": Client ID o Secret sbagliati, oppure il client è stato creato su un data center diverso da quello scelto qui."
+  },
+  "trouble3": {
+    "message": "Il badge mostra \"!\": l'accesso è stato revocato o è scaduto. Premi \"Ricollega\"."
+  },
+  "trouble4": {
+    "message": "Client Secret e token restano solo in questo browser e vengono inviati solo a Zoho; \"Scollega\" revoca anche l'accesso su Zoho."
+  },
+  "langLabel": {
+    "message": "Lingua"
+  },
+  "langAuto": {
+    "message": "Lingua del browser"
   }
 }

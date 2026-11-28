@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { findVerificationCode } from '../lib/codes.js';
-import { parseSender, normalizeThread } from '../background/icloud-api.js';
+import { parseSender, normalizeMessage, splitUid } from '../background/zoho-api.js';
 import { htmlToText, quoteForReply } from '../lib/text.js';
 import { parseInvitation, buildReply } from '../lib/ics.js';
 
@@ -33,10 +33,14 @@ test('manifest and locales are consistent', () => {
   for (const f of Object.values(m.icons)) assert.ok(fs.existsSync(new URL('../' + f, import.meta.url)));
 });
 
-test('parses thread digests', () => {
-  assert.deepEqual(parseSender('"Acme & Co." <a@x.invalid>'), { name: 'Acme & Co.', address: 'a@x.invalid' });
-  const m = normalizeThread({ threadId: 't1', senders: ['B <b@x.invalid>'], flags: ['\\Seen'], timestamp: 0 }, 'INBOX');
+test('normalizes Zoho messages', () => {
+  assert.deepEqual(parseSender('Acme &amp; Co.', 'a@x.invalid'), { name: 'Acme & Co.', address: 'a@x.invalid' });
+  assert.deepEqual(parseSender('b@x.invalid', '&lt;b@x.invalid&gt;'), { name: '', address: 'b@x.invalid' });
+  const m = normalizeMessage({ messageId: '42', folderId: '9', sender: 'B', fromAddress: 'b@x.invalid', status: '1', flagid: 'flag_not_set', receivedTime: '0', subject: 'Hi &quot;you&quot;' }, 'inbox');
   assert.equal(m.unread, false);
+  assert.equal(m.starred, false);
+  assert.equal(m.subject, 'Hi "you"');
+  assert.deepEqual(splitUid(m.uid), { fid: '9', mid: '42' });
 });
 
 test('html to text decodes entities and keeps lines', () => {

@@ -26,7 +26,7 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 const messages = JSON.parse(read('_locales/en/messages.json'));
 const i18n = Object.fromEntries(Object.entries(messages).map(([k, v]) => [k, v.message]));
 
-const bundle = (await build({ entryPoints: [path.join(root, 'popup/popup.js')], bundle: true, format: 'iife', write: false })).outputFiles[0].text;
+const bundle = (await build({ entryPoints: [path.join(root, 'popup/popup.js')], bundle: true, format: 'esm', target: 'es2022', write: false })).outputFiles[0].text;
 const css = read('popup/popup.css');
 const logo = 'data:image/png;base64,' + fs.readFileSync(path.join(root, 'icons/icon-48.png')).toString('base64');
 const bodyHtml = read('popup/popup.html').match(/<body>([\s\S]*?)<script type="module"/)[1].replace('../icons/icon-48.png', logo);
@@ -36,10 +36,10 @@ const iconSvg = read('design/icon.svg');
 const now = Date.now();
 const h = (n) => new Date(now - n * 3600e3).toISOString();
 const M = (i, from, addr, subject, preview, hours, unread, count = 1) => ({
-  uid: `t${i}`, threadId: `t${i}`, folder: 'INBOX', from, fromAddress: addr, subject, preview, date: h(hours), unread, starred: false, count
+  uid: `t${i}`, threadId: `t${i}`, folder: 'inbox', from, fromAddress: addr, subject, preview, date: h(hours), unread, starred: false, count
 });
 const LIST = [
-  M(1, 'Maria Bianchi', 'maria@example.invalid', 'Dinner on Friday?', 'Hi! Are you free on Friday evening? I booked a table for four at the new place near the station.', 0.4, true, 3),
+  M(1, 'Maria Bianchi', 'maria@example.invalid', 'Dinner on Friday?', 'Hi! Are you free on Friday evening? I booked a table for four at the new place near the station.', 0.4, true),
   M(2, 'Northwind Travel', 'no-reply@northwind.invalid', 'Your booking is confirmed', 'Thank you for booking with Northwind Travel. Your itinerary and e-tickets are attached to this message.', 2, true),
   M(3, 'Studio Verdi', 'hello@studioverdi.invalid', 'Invoice 2026-114', 'Please find attached the invoice for November. Payment is due within 30 days. Let us know if you have any questions.', 5, false),
   M(4, 'Acme Bank', 'security@acmebank.invalid', 'Your verification code', 'Your one-time code is 482915 and expires in 10 minutes. Never share this code with anyone.', 7, false),
@@ -62,7 +62,7 @@ window.__I18N = ${JSON.stringify(i18n)};
 window.__LIST = ${JSON.stringify(LIST)};
 window.__THREAD = ${JSON.stringify(THREAD)};
 window.chrome = {
-  i18n: { getMessage: (k) => window.__I18N[k] || '' },
+  i18n: { getMessage: (k) => window.__I18N[k] || '', getUILanguage: () => 'en' },
   storage: { sync: { get: async () => ({}) }, onChanged: { addListener() {} }, local: { get: async () => ({ state: { signedIn: true, email: 'demo@example.invalid', unread: 2 } }) } },
   runtime: {
     getURL: (p) => p, openOptionsPage() {},
@@ -70,8 +70,12 @@ window.chrome = {
       if (m.action === 'list') return { ok: true, result: window.__LIST };
       if (m.action === 'get') {
         const last = window.__THREAD[window.__THREAD.length - 1];
-        const multi = m.uid === 't1';
-        const thread = multi ? window.__THREAD : [{ ...last, uid: m.uid, from: 'Northwind Travel', fromAddress: 'no-reply@northwind.invalid', subject: 'Your booking is confirmed', html: '<div style="font-family:Arial;color:#202124;padding:6px"><h2 style="color:#1a73e8;margin:0 0 10px">Booking confirmed</h2><p>Thank you for booking with <b>Northwind Travel</b>.</p><p>Flight NW 482 · Milan → Lisbon · 14 Dec, 09:35</p><p style="background:#e6f4ea;padding:10px;border-radius:8px">Booking reference: <b>QX7K2P</b></p></div>', attachments: [{ name: 'e-ticket.pdf', size: 92000 }] }];
+        // Zoho shows one message at a time (no conversation grouping).
+        if (m.uid === 't4') {
+          const code = { ...last, uid: 't4', from: 'Acme Bank', fromAddress: 'security@acmebank.invalid', subject: 'Your verification code', unread: false, html: '<div style="font-family:Arial;color:#202124;padding:6px"><h2 style="color:#0b57d0;margin:0 0 10px">Sign-in verification</h2><p>Your one-time code is</p><p style="font-size:30px;letter-spacing:6px;font-weight:700;margin:8px 0">482915</p><p style="color:#5f6368">It expires in 10 minutes. Never share this code with anyone.</p></div>', attachments: [] };
+          return { ok: true, result: { ...code, thread: [code], code: '482915' } };
+        }
+        const thread = m.uid === 't1' ? [last] : [{ ...last, uid: m.uid, from: 'Northwind Travel', fromAddress: 'no-reply@northwind.invalid', subject: 'Your booking is confirmed', html: '<div style="font-family:Arial;color:#202124;padding:6px"><h2 style="color:#1a73e8;margin:0 0 10px">Booking confirmed</h2><p>Thank you for booking with <b>Northwind Travel</b>.</p><p>Flight NW 482 · Milan → Lisbon · 14 Dec, 09:35</p><p style="background:#e6f4ea;padding:10px;border-radius:8px">Booking reference: <b>QX7K2P</b></p></div>', attachments: [{ name: 'e-ticket.pdf', size: 92000 }] }];
         return { ok: true, result: { ...thread[thread.length - 1], thread, code: null } };
       }
       return { ok: true, result: {} };
@@ -106,7 +110,7 @@ function forceScheme(source, dark) {
 const SCENES = {
   list: { h: 620, act: '' },
   open: { h: 640, act: "document.querySelectorAll('.mail')[1].click();" },
-  thread: { h: 740, act: "document.querySelectorAll('.mail')[0].click();" },
+  code: { h: 640, act: "document.querySelectorAll('.mail')[3].click();" },
   reply: { h: 700, act: "document.querySelectorAll('.mail')[0].click(); setTimeout(()=>{ document.getElementById('act-reply').click(); setTimeout(() => { document.getElementById('c-editor').innerHTML = '<div>Sounds perfect, see you there!</div>'; }, 300); }, 500);" },
   trash: { h: 620, act: "document.querySelectorAll('#tabs button')[3].click(); setTimeout(() => document.getElementById('empty-trash').click(), 500);" },
   dark: { h: 620, act: '', dark: true }
@@ -115,12 +119,12 @@ const SCENES = {
 const shot = {};
 for (const [name, s] of Object.entries(SCENES)) {
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${forceScheme(css, !!s.dark)}${s.dark ? DARK : LIGHT}</style></head><body>${bodyHtml}`
-    + `<script>${stub}</script><script>${bundle}</script>`
+    + `<script>${stub}</script><script type="module">${bundle}</script>`
     + `<script>setTimeout(() => { ${s.act} }, 600);</script></body></html>`;
   const file = path.join(work, `${name}.html`);
   const png = path.join(work, `${name}.png`);
   fs.writeFileSync(file, html);
-  const args = ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--window-size=650,${s.h}`, '--force-device-scale-factor=2', '--virtual-time-budget=4000', `--screenshot=${png}`];
+  const args = ['--headless=new', '--lang=en-US', '--disable-gpu', '--hide-scrollbars', `--window-size=650,${s.h}`, '--force-device-scale-factor=2', '--virtual-time-budget=4000', `--screenshot=${png}`];
     args.push('file:///' + file.replace(/\\/g, '/'));
   execFileSync(CHROME, args, { stdio: 'ignore' });
   shot[name] = fs.readFileSync(png).toString('base64');
@@ -149,7 +153,7 @@ function screenshotSvg(name, title, sub, a, b) {
 const cards = [
   ['list', 'Your inbox,<tspan x="80" dy="62">one click away</tspan>', ['Unread badge, notifications', 'and search.'], '#7c3aed', '#2563eb'],
   ['open', 'Read mail<tspan x="80" dy="62">in the popup</tspan>', ['Remote images and trackers', 'are blocked.'], '#0ea5e9', '#22c55e'],
-  ['thread', 'Whole<tspan x="80" dy="62">conversations</tspan>', ['Older messages fold away,', 'one tap opens them.'], '#f97316', '#ec4899'],
+  ['code', 'One-click<tspan x="80" dy="62">codes</tspan>', ['One-time codes are spotted', 'in new mail automatically.'], '#f97316', '#ec4899'],
   ['reply', 'Reply in HTML<tspan x="80" dy="62">to HTML mail</tspan>', ['The original is quoted,', 'not flattened.'], '#14b8a6', '#6366f1'],
   ['dark', 'Light and dark,<tspan x="80" dy="62">your choice</tspan>', ['Follows your system theme', 'automatically.'], '#1f2937', '#4b5563']
 ];
@@ -182,8 +186,8 @@ function tile(W, H, shotName) {
   const px = W - pw - (big ? 40 : 16), py = big ? H - ph * 0.82 : 62;
   const tx = big ? 90 : 28;
   const title = big
-    ? `<text x="${tx}" y="330" font-family="${FONT}" font-size="72" font-weight="700" fill="#fff">iCloud Mail Checker</text>`
-    : `<text x="${tx}" y="140" font-family="${FONT}" font-size="27" font-weight="700" fill="#fff">iCloud Mail</text><text x="${tx}" y="170" font-family="${FONT}" font-size="27" font-weight="700" fill="#fff">Checker</text>`;
+    ? `<text x="${tx}" y="330" font-family="${FONT}" font-size="72" font-weight="700" fill="#fff">Zoho Mail Checker</text>`
+    : `<text x="${tx}" y="140" font-family="${FONT}" font-size="27" font-weight="700" fill="#fff">Zoho Mail</text><text x="${tx}" y="170" font-family="${FONT}" font-size="27" font-weight="700" fill="#fff">Checker</text>`;
   const sub = (big ? ['Unread badge, notifications,', 'search, read and reply.'] : ['Badge, alerts,', 'search and reply.'])
     .map((l, i) => `<text x="${tx}" y="${big ? 392 + i * 42 : 200 + i * 20}" font-family="${FONT}" font-size="${big ? 32 : 15}" fill="#fff" fill-opacity=".92">${l}</text>`).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">

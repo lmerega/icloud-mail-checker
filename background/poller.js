@@ -1,8 +1,9 @@
-import { listMessages, quickStatus, getSession, AuthError } from './icloud-api.js';
+import { listMessages, quickStatus, getSession, AuthError } from './zoho-api.js';
 import { DEFAULTS, FOLDERS } from './constants.js';
 import { findVerificationCode } from '../lib/codes.js';
+import { initI18n, t } from '../lib/i18n.js';
 
-export const ALARM = 'icloud-poll';
+export const ALARM = 'zoho-poll';
 
 export async function getSettings() {
   const { settings } = await chrome.storage.sync.get('settings');
@@ -38,12 +39,13 @@ async function setBadge(unread, signedIn) {
 }
 
 /**
- * One check. iCloud does not push to extensions (and extensions cannot open IMAP sockets), so we
+ * One check. Zoho does not push to extensions (and extensions cannot open IMAP sockets), so we
  * poll with a very light request (unread count + newest thread) and only fetch the list when that
  * changed. `force` skips the shortcut (manual refresh).
  */
 export async function poll(force = false) {
   try {
+    await initI18n();
     const sess = await getSession();
     const q = await quickStatus(FOLDERS.inbox);
     const sig = `${q.unseen}|${q.topThread}|${q.topTime}`;
@@ -66,8 +68,8 @@ export async function poll(force = false) {
           type: 'basic',
           silent: !!settings.sound,
           iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-          title: m.from || chrome.i18n.getMessage('newMail'),
-          message: code ? `${chrome.i18n.getMessage('codeLabel')}: ${code}` : m.subject
+          title: m.from || t('newMail'),
+          message: code ? `${t('codeLabel')}: ${code}` : m.subject
         });
       }
     }

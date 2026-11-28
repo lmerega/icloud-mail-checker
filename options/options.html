@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>iCloud Mail Checker</title>
+  <title>Zoho Mail Checker</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
@@ -13,8 +13,50 @@
   </header>
 
   <main>
+    <section class="card" id="acct">
+      <h2 data-i18n="sectionAccount"></h2>
+      <p id="acctState" class="hint"></p>
+      <div id="setup">
+        <p class="hint" data-i18n="setupHint"></p>
+        <details class="guide" open>
+          <summary data-i18n="guideTitle"></summary>
+          <ol id="guide"></ol>
+          <a id="consoleBtn" class="btn primary" target="_blank" rel="noopener" data-i18n="openConsole"></a>
+        </details>
+        <details class="guide">
+          <summary data-i18n="troubleTitle"></summary>
+          <ul class="trouble">
+            <li data-i18n="trouble1"></li>
+            <li data-i18n="trouble2"></li>
+            <li data-i18n="trouble3"></li>
+            <li data-i18n="trouble4"></li>
+          </ul>
+        </details>
+        <label class="field"><span data-i18n="redirectLabel"></span>
+          <span class="inline"><input id="redirect" readonly><button id="copyRedirect" class="btn" data-i18n="copy"></button></span>
+        </label>
+        <label class="field"><span data-i18n="regionLabel"></span><select id="region"></select></label>
+        <label class="field"><span>Client ID</span><input id="clientId" autocomplete="off" spellcheck="false"></label>
+        <label class="field"><span>Client Secret</span><input id="clientSecret" type="password" autocomplete="off" spellcheck="false"></label>
+        <p class="hint" data-i18n="secretNote"></p>
+      </div>
+      <div class="btns">
+        <button id="connect" class="btn primary" data-i18n="connect"></button>
+        <button id="disconnect" class="btn" data-i18n="disconnect" hidden></button>
+      </div>
+      <p id="acctMsg" class="hint"></p>
+    </section>
+
     <section class="card">
       <h2 data-i18n="sectionLook"></h2>
+      <div class="row">
+        <label for="lang" data-i18n="langLabel"></label>
+        <select id="lang">
+          <option value="auto" data-i18n="langAuto"></option>
+          <option value="en">English</option>
+          <option value="it">Italiano</option>
+        </select>
+      </div>
       <div class="row">
         <label for="theme" data-i18n="themeLabel"></label>
         <select id="theme">

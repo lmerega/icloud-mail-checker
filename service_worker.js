@@ -1,23 +1,27 @@
-import * as api from './background/icloud-api.js';
+import * as api from './background/zoho-api.js';
 import { ALARM, poll, scheduleAlarm, playDing } from './background/poller.js';
+import { FOLDERS, MAIL_HOST } from './background/constants.js';
 import { findVerificationCode } from './lib/codes.js';
 
-const MAIL_URL = 'https://www.icloud.com/mail/';
+async function mailUrl() {
+  const { auth } = await chrome.storage.local.get('auth');
+  return `${auth?.mailBase || 'https://mail.zoho.eu'}/zm/`;
+}
 
-// Reuse an iCloud Mail tab if one is already open, otherwise open a new one.
+// Reuse a Zoho Mail tab if one is already open, otherwise open a new one.
 async function openMail() {
-  const tabs = await chrome.tabs.query({ url: 'https://www.icloud.com/mail*' });
+  const url = await mailUrl();
+  const tabs = (await chrome.tabs.query({})).filter((t) => t.url && MAIL_HOST.test(t.url));
   if (tabs.length) {
     await chrome.tabs.update(tabs[0].id, { active: true });
     await chrome.windows.update(tabs[0].windowId, { focused: true });
   } else {
-    await chrome.tabs.create({ url: MAIL_URL });
+    await chrome.tabs.create({ url });
   }
 }
 chrome.commands.onCommand.addListener((c) => { if (c === 'open-mail') openMail(); });
 
 async function init() {
-  await api.installHeaderRules();
   await scheduleAlarm();
   await poll();
 }
@@ -42,19 +46,23 @@ const actions = {
       return out;
     }
     try {
-      const q = await api.quickStatus('INBOX');
+      const q = await api.quickStatus(FOLDERS.inbox);
       out.inbox = { ok: true, detail: String(q.unseen) };
     } catch (e) { out.inbox = { ok: false, detail: String(e.message || e) }; }
     try {
-      await Promise.all(['Archive', 'Sent Messages', 'Deleted Messages'].map((f) => api.listMessages(f, 1)));
+      await Promise.all([FOLDERS.sent, FOLDERS.trash].map((f) => api.listMessages(f, 1)));
       out.folders = { ok: true };
     } catch (e) { out.folders = { ok: false, detail: String(e.message || e) }; }
     return out;
   },
   testSound: ({ sound }) => playDing(sound).then(() => ({ played: true })),
-  emptyTrash: () => api.emptyFolder('Deleted Messages'),
+  emptyTrash: () => api.emptyFolder(FOLDERS.trash),
   poll: () => poll(true),
-  signIn: () => chrome.tabs.create({ url: 'https://www.icloud.com/' }),
+  // Sign-in needs the Client ID/Secret, so it lives in the options page.
+  signIn: () => chrome.runtime.openOptionsPage(),
+  connect: () => api.signIn().then((s) => ({ email: s.email })),
+  disconnect: () => api.signOut(),
+  redirectUrl: () => api.redirectUrl(),
   openWeb: () => openMail(),
   list: ({ folder, q }) => api.listMessages(folder, 30, q),
   send: ({ to, subject, body, html }) => api.sendMessage({ to, subject, body, html }),
@@ -70,11 +78,19 @@ const actions = {
   trash: ({ folder, uids }) => api.trash(folder, uids),
 };
 
-chrome.runtime.onMessage.addListener((msg, _s, send) => {
+chrome.runtime.onMessage.addListener((msg, sender, send) => {
+  if (sender.id !== chrome.runtime.id) return false;
   const fn = actions[msg?.action];
   if (!fn) return false;
   Promise.resolve(fn(msg))
-    .then(async (r) => { if (msg.action !== 'poll') await poll(); send({ ok: true, result: r }); })
-    .catch((e) => send({ ok: false, error: String(e.message || e), auth: e instanceof api.AuthError }));
+    .then(async (r) => {
+      if (!['poll', 'redirectUrl', 'testSound'].includes(msg.action)) await poll();
+      send({ ok: true, result: r });
+    })
+    .catch(async (e) => {
+      // Refresh badge/state right away when the account is no longer usable.
+      if (msg.action === 'connect' || e instanceof api.AuthError) await poll();
+      send({ ok: false, error: String(e.message || e), auth: e instanceof api.AuthError });
+    });
   return true;
 });

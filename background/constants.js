@@ -1,21 +1,33 @@
-// Central place for every iCloud web endpoint detail.
-// PARTLY VERIFIED (2026-11-27, icloud.com mail2 bundle 2642Hotfix89): paths wm/folder, wm/message,
-// wm/messagepart exist and are POSTed with {method, params}; folder ids are "folder:<name>".
-// Newer mailws2/v1 endpoints (queryThreads, labels) also exist. Method params still UNVERIFIED: iCloud Mail has no public API. These values mirror what the
-// icloud.com web app is believed to use and may change without notice.
-// If something breaks, fix it here and in icloud-api.js only.
-export const SETUP_URL = 'https://setup.icloud.com/setup/ws/1/validate';
-export const WEB_ORIGIN = 'https://www.icloud.com';
-export const CLIENT = {
-  clientBuildNumber: '2420Project37',
-  clientMasteringNumber: '2420B20'
+// Central place for every Zoho detail. Uses the official, documented Zoho Mail REST API
+// (https://www.zoho.com/mail/help/api/) with OAuth 2.0 and the user's own API Console client.
+
+// Zoho data centers. The Mail API host is the accounts host with "mail." instead of "accounts.".
+export const REGIONS = {
+  eu: { label: 'Europe (zoho.eu)', accounts: 'https://accounts.zoho.eu', console: 'https://api-console.zoho.eu' },
+  com: { label: 'United States (zoho.com)', accounts: 'https://accounts.zoho.com', console: 'https://api-console.zoho.com' },
+  in: { label: 'India (zoho.in)', accounts: 'https://accounts.zoho.in', console: 'https://api-console.zoho.in' },
+  au: { label: 'Australia (zoho.com.au)', accounts: 'https://accounts.zoho.com.au', console: 'https://api-console.zoho.com.au' },
+  jp: { label: 'Japan (zoho.jp)', accounts: 'https://accounts.zoho.jp', console: 'https://api-console.zoho.jp' },
+  ca: { label: 'Canada (zohocloud.ca)', accounts: 'https://accounts.zohocloud.ca', console: 'https://api-console.zohocloud.ca' },
+  sa: { label: 'Saudi Arabia (zoho.sa)', accounts: 'https://accounts.zoho.sa', console: 'https://api-console.zoho.sa' },
+  uk: { label: 'United Kingdom (zoho.uk)', accounts: 'https://accounts.zoho.uk', console: 'https://api-console.zoho.uk' },
+  cn: { label: 'China (zoho.com.cn)', accounts: 'https://accounts.zoho.com.cn', console: 'https://api-console.zoho.com.cn' }
 };
+
+export const ACCOUNTS_HOST = /^https:\/\/accounts\.(zoho\.(com|eu|in|com\.au|jp|sa|uk|com\.cn)|zohocloud\.ca)$/;
+export const MAIL_HOST = /^https:\/\/mail\.(zoho\.(com|eu|in|com\.au|jp|sa|uk|com\.cn)|zohocloud\.ca)\//;
+
+// Read + write: list, read, flag, move, delete, send, empty trash.
+export const SCOPES = 'ZohoMail.accounts.READ,ZohoMail.folders.ALL,ZohoMail.messages.ALL';
+
+// Folder tabs of the popup are roles; the real Zoho folder ids are resolved at runtime.
 export const FOLDERS = {
-  inbox: 'INBOX',
-  archive: 'Archive',
-  trash: 'Deleted Messages',
-  sent: 'Sent Messages'
+  inbox: 'inbox',
+  archive: 'archive',
+  trash: 'trash',
+  sent: 'sent'
 };
+
 export const DEFAULTS = {
   pollMinutes: 1,
   notifications: true,

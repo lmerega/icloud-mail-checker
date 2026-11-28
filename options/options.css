@@ -49,3 +49,17 @@ select { background: var(--field); color: var(--text); border: 0; border-radius:
 .snd input { accent-color: var(--accent); width: 18px; height: 18px; }
 .snd .btn { padding: 6px 14px; }
 .snd.on { outline: 2px solid var(--accent); }
+
+.field { display: grid; gap: 6px; padding: 10px 0; font-size: 14px; }
+.field input { background: var(--field); color: var(--text); border: 0; border-radius: 10px; padding: 9px 12px; font: inherit; width: 100%; }
+.field .inline { display: flex; gap: 8px; }
+.field .inline input { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+#acctMsg.bad { color: var(--bad); }
+
+.guide { background: var(--field); border-radius: 16px; padding: 10px 16px; margin: 10px 0; }
+.guide summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+.guide ol, .guide ul { margin: 8px 0 12px; padding-left: 22px; }
+.guide li { margin: 6px 0; line-height: 1.5; }
+.guide code { background: var(--card); border-radius: 6px; padding: 1px 6px; font-size: 12.5px; overflow-wrap: anywhere; }
+.guide a { color: var(--accent); }
+.guide .btn.primary { display: inline-block; text-decoration: none; color: #fff; margin: 2px 0 8px; }
