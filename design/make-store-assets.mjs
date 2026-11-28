@@ -198,6 +198,11 @@ function tile(W, H, shotName) {
   <image x="${px}" y="${py}" width="${pw}" height="${ph}" preserveAspectRatio="xMidYMin slice" clip-path="url(#c)" href="data:image/png;base64,${shot[shotName]}"/>
 </svg>`;
 }
+// Store icon: Google asks for 96x96 artwork centered in a 128x128 canvas with transparent padding.
+fs.writeFileSync(path.join(out, 'store-icon-128.png'), new Resvg(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><g transform="translate(16 16) scale(0.75)">${iconSvg.replace(/<\/?svg[^>]*>/g, '')}</g></svg>`,
+  { fitTo: { mode: 'width', value: 128 } }
+).render().asPng());
 render(tile(440, 280, 'list'), 'promo-small-440x280.png', 440);
 render(tile(1400, 560, 'list'), 'promo-marquee-1400x560.png', 1400);
 console.log(fs.readdirSync(out).join('\n'));

@@ -34,7 +34,8 @@ Titolo e riepilogo NON si compilano: il dashboard li legge dal pacchetto
 - Descrizione EN: `store/description-en.txt`
 - Descrizione IT: `store/description-it.txt`
 - Categoria: Produttività (Productivity)
-- Icona dello store 128x128: `icons/icon-128.png`
+- Icona dello store 128x128: `store/assets/store-icon-128.png` (disegno 96x96 con 16 px di margine
+  trasparente, come chiede Google; `icons/icon-128.png` è a tutto riquadro e nello store sembrerebbe più grande)
 - Screenshot 1280x800: `store/assets/screenshot-1-list.png` ... `screenshot-5-dark.png`
 - Riquadro promozionale piccolo 440x280: `store/assets/promo-small-440x280.png`
 - Riquadro marquee 1400x560: `store/assets/promo-marquee-1400x560.png`
