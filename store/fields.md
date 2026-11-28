@@ -9,6 +9,15 @@ iCloud Mail Checker: aggiornarla trasformerebbe in silenzio l'estensione degli u
 un'estensione per Zoho, e il revisore la vedrebbe come cambio di scopo. La scheda iCloud va
 ritirata a parte (Distribuzione -> Visibilità: Non in elenco o "Annulla pubblicazione").
 
+## Elemento sullo store
+
+- ID elemento: `noinmagpdmciljliepmffbcckfmjjpbo`
+- Redirect URI della versione dello store (da aggiungere al client nella Zoho API Console):
+  `https://noinmagpdmciljliepmffbcckfmjjpbo.chromiumapp.org/zoho`
+- 2026-11-28, primo invio rifiutato per "Spam di parole chiave" (Yellow Argon): la descrizione
+  elencava tutti i domini dei data center Zoho. Corretto togliendo l'elenco e riducendo le
+  ripetizioni di "Zoho". Niente elenchi di domini, marchi o parole chiave nelle descrizioni.
+
 ## 1. Pacchetto
 
 ```

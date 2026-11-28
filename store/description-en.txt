@@ -9,9 +9,7 @@ Zoho Mail Checker puts your Zoho Mail in the Chrome toolbar.
 • Verification codes detected and copied in one click
 • Light, dark or automatic theme; English and Italian; settings export/import
 
-Private by design: the extension talks only to Zoho, through the official Zoho Mail API, with an OAuth client you create yourself in the Zoho API Console (free, about 2 minutes, step-by-step guide in the options). Your password is never seen; Client Secret and tokens stay in your browser. There is no developer server: the developer receives nothing.
+Private by design: the extension talks only to the official Zoho Mail API, with an OAuth client you create yourself in the API Console (free, about 2 minutes, step-by-step guide in the options). Your password is never seen; Client Secret and tokens stay in your browser. There is no developer server: the developer receives nothing. Works with every data center.
 
-Works with every Zoho data center (zoho.com, zoho.eu, zoho.in, zoho.com.au, zoho.jp, zohocloud.ca, zoho.sa, zoho.uk, zoho.com.cn).
-
-Unofficial and independent. Not affiliated with, endorsed or sponsored by Zoho Corporation. Zoho is a trademark of Zoho Corporation.
+Unofficial and independent. Not affiliated with, endorsed or sponsored by Zoho Corporation, owner of the Zoho trademark.
 Open source (MIT): github.com/lmerega/zoho-mail-checker
